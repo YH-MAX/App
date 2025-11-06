@@ -16,12 +16,7 @@ This directly supports the **“reducing pollution”** and **“minimizing rele
 
 ##  Goal
 
-To improve water quality by:
-- Reducing pollution  
-- Eliminating dumping and minimizing the release of hazardous chemicals and materials  
-- Halving the proportion of untreated wastewater  
-- Increasing recycling and safe reuse globally  
-
+The goal is to improve water quality by reducing pollution, eliminating dumping and minimizing release of hazardous chemicals and materials, halving the proportion of untreated wastewater and substantially increasing recycling and safe reuse globally. 
 ---
 
 ##  System Requirements
@@ -31,7 +26,7 @@ Include **2 non-functional requirements** with justifications.
 
 ---
 
-##  Module 1: (e.g., User Login & Authentication)
+##  Module 1: 
 
 **Functional Requirements:**
 1.  
@@ -40,7 +35,15 @@ Include **2 non-functional requirements** with justifications.
 
 ---
 
-##  Module 2: (e.g., Water Data Input)
+##  Module 2:
+**Functional Requirements:**
+1.  
+2.  
+3.  
+
+---
+
+##  Module 3:
 
 **Functional Requirements:**
 1.  
@@ -49,7 +52,7 @@ Include **2 non-functional requirements** with justifications.
 
 ---
 
-##  Module 3: (e.g., Data Visualization)
+##  Module 4:
 
 **Functional Requirements:**
 1.  
@@ -58,16 +61,7 @@ Include **2 non-functional requirements** with justifications.
 
 ---
 
-##  Module 4: (e.g., Pollution Alert System)
-
-**Functional Requirements:**
-1.  
-2.  
-3.  
-
----
-
-##  Module 5: (e.g., Community Report & Sharing)
+##  Module 5:
 
 **Functional Requirements:**
 1.  

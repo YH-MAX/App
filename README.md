@@ -26,47 +26,57 @@ Include **2 non-functional requirements** with justifications.
 
 ---
 
-##  Module 1: 
+##  Module 1: User Authentication and Profile Management 
 
 **Functional Requirements:**
-1.  
-2.  
-3.  
+1. The user shall be able to register an account using an email address and password. 
+
+2. The user shall be able to log in and log out of the application securely. 
+
+3. The user shall be able to view and update personal details such as name, and  	ccontact.   
 
 ---
 
-##  Module 2:
+##  Module 2:Bluetooth Data Collection 
 **Functional Requirements:**
-1.  
-2.  
-3.  
+1. The user shall be able to pair and connect the app with the water monitoring device using Bluetooth. 
+
+2. The app shall automatically receive and display sensor readings such as pH level, and temperature in real time. 
+
+3. The app shall notify the user if the Bluetooth connection is lost or if data transmission fails. 
 
 ---
 
-##  Module 3:
+##  Module 3:Monitoring Dashboard 
 
 **Functional Requirements:**
-1.  
-2.  
-3.  
+1. The app shall visualize current and past water quality data through charts and color-coded indicators. 
+
+2. The app shall allow users to view detailed statistics for each recorded session, including timestamp and location. 
+
+3. The app shall classify water quality status (e.g., Safe, Moderate, Polluted) based on predefined thresholds. 
 
 ---
 
-##  Module 4:
+##  Module 4: Alert and Reporting System
 
 **Functional Requirements:**
-1.  
-2.  
-3.  
+1. The app shall generate an alert when water quality parameters exceed safe levels. 
+
+2. The user shall be able to submit a pollution report with description and optional photos. 
+
+3. The app shall store all reports in the database and allow viewing of report history. 
 
 ---
 
-##  Module 5:
+##  Module 5:Real-Time Chat & Community Platform
 
 **Functional Requirements:**
-1.  
-2.  
-3.  
+1. Users from different locations shall be able to chat or post updates about local water quality in real time, like a social feed. 
+
+2. Users shall be able to attach photos, short text, or water sensor readings in their posts to report local conditions. 
+
+3. The app shall allow experts or authorized users to reply to community posts and provide verified guidance or recommendations. 
 
 ---
 

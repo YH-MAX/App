@@ -1,4 +1,4 @@
-# WaterAPP Backend — API Documentation (v1.0)
+# WaterAPP Backend — API Documentation Temporarily
 
 Backend: Spring Boot (Java)  
 Auth: JWT  

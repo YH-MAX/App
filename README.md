@@ -1,56 +1,39 @@
-SmartWater Backend – API Documentation (v1.0)
+# WaterAPP Backend — API Documentation (v1.0)
 
-Backend: Spring Boot (Java)
-Auth: JWT
-Base Path: /api/*
+Backend: Spring Boot (Java)  
+Auth: JWT  
+Base Path: `/api/*`
 
-This document contains the complete API reference for SmartWater, including:
+It documents endpoints for user authentication, sensor data, pollution reports, community features, and alerts.
 
-User Authentication
+Table of Contents
+- User API (/api/users)
+- Sensor API (/api/sensor)
+- Pollution Report API (/api/reports)
+- Community API (/api/community)
+- Alert API (/api/alerts)
+- Global Headers
+- Global Status Codes
+- Base URL
+- Examples
 
-Water Sensor Data
+---
 
-Pollution Reports
+## 1. User API — /api/users
 
-Community Forum
-
-Auto Alert System
-
-Global Status Codes & Headers
-
- Table of Contents
-
-User API (/api/users)
-
-Sensor API (/api/sensor)
-
-Pollution Report API (/api/reports)
-
-Community API (/api/community)
-
-Alert API (/api/alerts)
-
-Global Headers
-
-Global Status Codes
-
-Base URL
-
- <a id="user-api"></a> 1. User API — /api/users
-1.1 Register
-POST /api/users/register
-
-Create a new user.
-
-Request Body
+1.1 Register  
+POST /api/users/register  
+Request body:
+```json
 {
   "name": "Yan Han",
   "email": "yan@example.com",
   "password": "123456",
   "role": "USER"
 }
-
-Response
+```
+Response (201 Created):
+```json
 {
   "id": 1,
   "name": "Yan Han",
@@ -58,42 +41,44 @@ Response
   "role": "USER",
   "createdAt": "2025-01-02T10:00:00"
 }
+```
 
-1.2 Login
-POST /api/users/login
-
-Authenticate user and return JWT.
-
-Request Body
+1.2 Login  
+POST /api/users/login  
+Request body:
+```json
 {
   "email": "yan@example.com",
   "password": "123456"
 }
-
-Response
+```
+Response:
+```json
 {
   "token": "JWT_TOKEN_HERE",
   "email": "yan@example.com",
   "message": "Login successful!"
 }
+```
 
- <a id="sensor-api"></a> 2. Sensor API — /api/sensor
-2.1 Upload Sensor Data
-POST /api/sensor/upload
+---
 
-Upload pH / temperature / turbidity for the current user.
+## 2. Sensor API — /api/sensor
 
- Requires JWT
-
-Request Body
+2.1 Upload Sensor Data  
+POST /api/sensor/upload  
+Requires JWT (Authorization: Bearer <token>)  
+Request body:
+```json
 {
   "ph": 6.9,
   "temperature": 27.8,
   "turbidity": 4.1,
   "location": "KK3"
 }
-
-Response
+```
+Response:
+```json
 {
   "id": 15,
   "email": "user@example.com",
@@ -103,10 +88,12 @@ Response
   "location": "KK3",
   "timestamp": "2025-01-02T10:12:30"
 }
+```
 
-2.2 Get Latest Sensor Data
-GET /api/sensor/me/latest
-Response
+2.2 Get Latest Sensor Data (current user)  
+GET /api/sensor/me/latest  
+Response:
+```json
 {
   "ph": 7.1,
   "temperature": 26.4,
@@ -115,24 +102,16 @@ Response
   "timestamp": "2025-01-02T11:00:00",
   "status": "GOOD"
 }
+```
 
-2.3 Get Data by Date Range
-GET /api/sensor/me/range?from=...&to=...
-Response
-[
-  {
-    "ph": 7.0,
-    "temperature": 26.0,
-    "turbidity": 3.9,
-    "location": "KK12",
-    "timestamp": "2025-01-01T11:00:00",
-    "status": "FAIR"
-  }
-]
+2.3 Get Data by Date Range  
+GET /api/sensor/me/range?from=...&to=...  
+Response: Array of sensor readings.
 
-2.4 Summary
-GET /api/sensor/me/summary?from=...&to=...
-Response
+2.4 Summary  
+GET /api/sensor/me/summary?from=...&to=...  
+Response:
+```json
 {
   "avgPh": 7.05,
   "avgTemperature": 26.7,
@@ -140,21 +119,25 @@ Response
   "overallStatus": "FAIR",
   "count": 12
 }
+```
 
- <a id="pollution-report-api"></a> 3. Pollution Report API — /api/reports
-3.1 Submit Report
-POST /api/reports
+---
 
- Requires JWT
+## 3. Pollution Report API — /api/reports
 
-Request Body
+3.1 Submit Report  
+POST /api/reports  
+Requires JWT  
+Request body:
+```json
 {
   "description": "Water smells strange near KK11.",
   "photoUrl": "https://example.com/pic.jpg",
   "location": "KK11"
 }
-
-Response
+```
+Response:
+```json
 {
   "message": "Report submitted successfully.",
   "id": 12,
@@ -167,29 +150,33 @@ Response
   "adminComment": null,
   "resolvedAt": null
 }
+```
 
-3.2 My Reports
+3.2 My Reports  
 GET /api/reports/me
 
-Returns only the current user’s reports.
-
-3.3 All Reports
+3.3 All Reports  
 GET /api/reports
-3.4 Update Status (Admin)
-PUT /api/reports/{id}/status
-Request Body
+
+3.4 Update Status (Admin)  
+PUT /api/reports/{id}/status  
+Request body:
+```json
 {
   "status": "RESOLVED",
   "adminComment": "Issue fixed."
 }
+```
 
- <a id="community-api"></a> 4. Community API — /api/community
-4.1 Create Post
-POST /api/community/posts
+---
 
- Requires JWT
+## 4. Community API — /api/community
 
-Request Body
+4.1 Create Post  
+POST /api/community/posts  
+Requires JWT  
+Request body:
+```json
 {
   "content": "Water looks cloudy.",
   "photoUrl": "https://example.com/img.jpg",
@@ -199,65 +186,103 @@ Request Body
   "turbidity": 3.5,
   "type": "report"
 }
+```
 
-4.2 Get All Posts
-GET /api/community/posts
+4.2 Get All Posts  
+GET /api/community/posts  
+Optional query: ?location=KK5
 
-Optional: ?location=KK5
-
-4.3 Get Post By ID
+4.3 Get Post By ID  
 GET /api/community/posts/{id}
-4.4 Like Post
+
+4.4 Like Post  
 POST /api/community/posts/{postId}/like
-4.5 Reply to Post
-POST /api/community/posts/{postId}/replies
 
- Requires JWT
-
-Request Body
+4.5 Reply to Post  
+POST /api/community/posts/{postId}/replies  
+Requires JWT  
+Request body:
+```json
 {
   "content": "Agree, turbidity is high.",
   "expertReply": false
 }
+```
 
-4.6 Get Replies
+4.6 Get Replies  
 GET /api/community/posts/{postId}/replies
- <a id="alert-api"></a> 5. Alert API — /api/alerts
-5.1 Evaluate Water Reading
-POST /api/alerts/evaluate
 
+---
 
-Request Body
+## 5. Alert API — /api/alerts
+
+5.1 Evaluate Water Reading  
+POST /api/alerts/evaluate  
+JWT optional  
+If severity is HIGH, a pollution report will be created automatically.
+
+Request body:
+```json
 {
   "ph": 7.2,
   "temperature": 25.5,
   "turbidity": 3.8
 }
-
-Response
+```
+Response:
+```json
 {
   "alert": true,
   "severity": "HIGH",
   "message": "Dangerous contamination detected!"
 }
+```
 
- <a id="global-headers"></a> 6. Global Headers
+---
+
+## 6. Global Headers
+
 For JWT-protected endpoints:
-Authorization: Bearer <token>
-Content-Type: application/json
+- Authorization: Bearer <token>
+- Content-Type: application/json
 
- <a id="global-status-codes"></a> 7. Global Status Codes
-Code	Meaning
-200	OK
-201	Created
-400	Bad Request
-401	Unauthorized
-403	Forbidden
-404	Not Found
-500	Server Error
- <a id="base-url"></a> 8. Base URL
-Local Development
+---
+
+## 7. Global Status Codes
+
+- 200 OK
+- 201 Created
+- 400 Bad Request
+- 401 Unauthorized
+- 403 Forbidden
+- 404 Not Found
+- 500 Server Error
+
+---
+
+## 8. Base URL
+
+Local development:
 http://localhost:8080
 
-Production Example
+Production example:
 https://smartwater.yourdomain.com
+
+---
+
+## Examples (curl)
+
+Login and get token:
+```bash
+curl -X POST http://localhost:8080/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"yan@example.com","password":"123456"}'
+```
+
+Upload sensor data (with token):
+```bash
+curl -X POST http://localhost:8080/api/sensor/upload \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"ph":6.9,"temperature":27.8,"turbidity":4.1,"location":"KK3"}'
+```

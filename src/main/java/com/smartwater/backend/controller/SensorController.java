@@ -5,17 +5,18 @@ import com.smartwater.backend.dto.SensorDataResponse;
 import com.smartwater.backend.dto.WaterQualitySummaryResponse;
 import com.smartwater.backend.model.SensorData;
 import com.smartwater.backend.service.SensorDataService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/sensor")
+@CrossOrigin(origins = "*")
 public class SensorController {
 
     private final SensorDataService sensorDataService;
@@ -26,9 +27,10 @@ public class SensorController {
 
 
     @PostMapping("/upload")
-    public SensorData uploadSensorData(@RequestBody @Valid SensorDataRequest req,
-                                       @AuthenticationPrincipal UserDetails userDetails) {
-
+    public SensorDataResponse uploadSensorData(
+            @RequestBody @Valid SensorDataRequest req,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         String email = userDetails.getUsername();
 
         SensorData data = new SensorData();
@@ -36,13 +38,17 @@ public class SensorController {
         data.setTemperature(req.getTemperature());
         data.setTurbidity(req.getTurbidity());
         data.setLocation(req.getLocation());
+        // timestamp 在实体里默认是 LocalDateTime.now()
 
-        return sensorDataService.saveSensorDataForUser(data, email);
+        SensorData saved = sensorDataService.saveSensorDataForUser(data, email);
+        return sensorDataService.toResponse(saved);
     }
 
 
     @GetMapping("/me/latest")
-    public SensorDataResponse getMyLatest(@AuthenticationPrincipal UserDetails userDetails) {
+    public SensorDataResponse getMyLatest(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         String email = userDetails.getUsername();
         return sensorDataService.getLatestForUserWithStatus(email);
     }

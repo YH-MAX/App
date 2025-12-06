@@ -2,6 +2,8 @@ package com.smartwater.backend.repository;
 
 import com.smartwater.backend.model.CommunityReply;
 import com.smartwater.backend.model.CommunityPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,5 +12,9 @@ import java.util.List;
 @Repository
 public interface CommunityReplyRepository extends JpaRepository<CommunityReply, Long> {
 
+
     List<CommunityReply> findByPostOrderByCreatedAtAsc(CommunityPost post);
+
+
+    Page<CommunityReply> findByPostOrderByCreatedAtAsc(CommunityPost post, Pageable pageable);
 }

@@ -1,17 +1,7 @@
-### Like post 2 (send this request)
-POST http://localhost:8080/api/community/posts/2/like
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0ZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NjM1NDM4MzEsImV4cCI6MTc2MzU0NzQzMX0.GhOWznhvQkmYSmKw-dXieW9nHLKI9Sy7B9oxvDO9Pv0
+PUT http://localhost:8080/api/reports/1/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZDIwMDZ5eGNAMTYzLmNvbSIsImlhdCI6MTc2NDk5NTYxNywiZXhwIjoxNzY1MDgyMDE3fQ.O1QGaAwk3aeMdlz1kjMcmSqq7zWjUfNcbh_6QygRx3s
+Content-Type: application/json
 
-
- {
-   "id": 2,
-  "content": "Heavy smell and foam observed near the drainage outlet.",
-  "photoUrl": "https://example.com/alert-photo.jpg",
-   "location": "Sungai Klang - Section 17",
-   "type": "ALERT",
-   "ph": 5.5,
-   "temperature": null,
-   "turbidity": 9.0,
-   "likes": 2,
-   "createdAt": "2025-11-19T18:01:07.8765654"
- }
+{
+  "status": "ABC"
+}

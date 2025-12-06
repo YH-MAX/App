@@ -2,6 +2,7 @@ package com.smartwater.backend.service;
 
 import com.smartwater.backend.dto.SensorDataResponse;
 import com.smartwater.backend.dto.WaterQualitySummaryResponse;
+import com.smartwater.backend.exception.NotFoundException;
 import com.smartwater.backend.model.SensorData;
 import com.smartwater.backend.model.User;
 import com.smartwater.backend.model.WaterQualityStatus;
@@ -27,9 +28,10 @@ public class SensorDataService {
 
     public SensorData saveSensorDataForUser(SensorData data, String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+                .orElseThrow(() -> new NotFoundException("User not found: " + email));
 
         data.setUser(user);
+
         return sensorDataRepository.save(data);
     }
 
@@ -43,7 +45,7 @@ public class SensorDataService {
         }
 
         double turbidity = data.getTurbidity();
-        if (turbidity > 5.0) { // 假设 >5 就比较浑浊
+        if (turbidity > 5.0) { // >5 NTU 视为浑浊
             score++;
         }
 
@@ -62,7 +64,7 @@ public class SensorDataService {
     }
 
 
-    private SensorDataResponse toResponse(SensorData data) {
+    public SensorDataResponse toResponse(SensorData data) {
         if (data == null) {
             return null;
         }
@@ -80,12 +82,12 @@ public class SensorDataService {
 
     public SensorDataResponse getLatestForUserWithStatus(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+                .orElseThrow(() -> new NotFoundException("User not found: " + email));
 
         return sensorDataRepository
                 .findFirstByUser_IdOrderByTimestampDesc(user.getId())
                 .map(this::toResponse)
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("No sensor data found for user: " + email));
     }
 
 
@@ -94,7 +96,7 @@ public class SensorDataService {
                                                                     LocalDateTime to) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+                .orElseThrow(() -> new NotFoundException("User not found: " + email));
 
         List<SensorData> list = sensorDataRepository
                 .findByUser_IdAndTimestampBetweenOrderByTimestampAsc(
@@ -118,7 +120,13 @@ public class SensorDataService {
         summary.setTotalRecords(total);
 
         if (total == 0) {
-
+            // 没有记录时，平均值 & 计数都设 0，overallStatus 交给前端看着处理（null）
+            summary.setAvgPh(0.0);
+            summary.setAvgTemperature(0.0);
+            summary.setAvgTurbidity(0.0);
+            summary.setSafeCount(0);
+            summary.setModerateCount(0);
+            summary.setPollutedCount(0);
             summary.setOverallStatus(null);
             return summary;
         }
@@ -151,7 +159,6 @@ public class SensorDataService {
         summary.setSafeCount(safe);
         summary.setModerateCount(moderate);
         summary.setPollutedCount(polluted);
-
 
         if (polluted > 0) {
             summary.setOverallStatus(WaterQualityStatus.POLLUTED);

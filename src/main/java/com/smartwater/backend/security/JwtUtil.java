@@ -27,10 +27,10 @@ public class JwtUtil {
 
     public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(username)                     // 保存 username
-                .setIssuedAt(new Date())                   // 签发时间
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))  // 过期时间
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // 签名
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 

@@ -1,56 +1,46 @@
 package com.smartwater.backend.controller;
 
+import com.smartwater.backend.dto.AlertResponse;
 import com.smartwater.backend.dto.WaterReadingRequest;
 import com.smartwater.backend.service.AlertService;
 import com.smartwater.backend.service.PollutionReportService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/alerts")
+
 @CrossOrigin(origins = "*")
 public class AlertController {
 
-    @Autowired
-    private AlertService alertService;
+    private final AlertService alertService;
+    private final PollutionReportService pollutionReportService;
 
-    @Autowired
-    private PollutionReportService pollutionReportService;
-
+    public AlertController(AlertService alertService,
+                           PollutionReportService pollutionReportService) {
+        this.alertService = alertService;
+        this.pollutionReportService = pollutionReportService;
+    }
 
     @PostMapping("/evaluate")
-    public Map<String, Object> evaluate(
+    public ResponseEntity<AlertResponse> evaluate(
             @AuthenticationPrincipal UserDetails currentUser,
-            @RequestBody WaterReadingRequest readingRequest
+            @Valid @RequestBody WaterReadingRequest readingRequest
     ) {
+        AlertResponse result = alertService.evaluateReading(readingRequest);
 
-        Map<String, Object> result = alertService.evaluateReading(readingRequest);
-
-
-        Object alertObj = result.get("alert");
-        Object severityObj = result.get("severity");
-
-        boolean severeAlert = false;
-        if (alertObj instanceof Boolean && (Boolean) alertObj) {
-            if (severityObj instanceof String && "HIGH".equals(severityObj)) {
-                severeAlert = true;
-            }
-        }
-
+        boolean severeAlert = result.isAlert() && "HIGH".equals(result.getSeverity());
 
         if (severeAlert && currentUser != null) {
             String email = currentUser.getUsername();
 
             StringBuilder desc = new StringBuilder("Auto-generated HIGH severity alert. ");
-            Object msgObj = result.get("message");
-            if (msgObj instanceof String && !((String) msgObj).isBlank()) {
-                desc.append(msgObj).append(" ");
+            if (result.getMessage() != null && !result.getMessage().isBlank()) {
+                desc.append(result.getMessage()).append(" ");
             }
-
 
             desc.append("Readings: ");
             if (readingRequest.getPh() != null) {
@@ -63,7 +53,6 @@ public class AlertController {
                 desc.append("Turbidity=").append(readingRequest.getTurbidity()).append(" NTU ");
             }
 
-
             pollutionReportService.createReport(
                     email,
                     desc.toString().trim(),
@@ -73,7 +62,6 @@ public class AlertController {
             );
         }
 
-
-        return result;
+        return ResponseEntity.ok(result);
     }
 }

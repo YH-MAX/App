@@ -1,44 +1,36 @@
 package com.smartwater.backend.service;
 
+import com.smartwater.backend.dto.AlertResponse;
 import com.smartwater.backend.dto.WaterReadingRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Service
 public class AlertService {
-
 
     private static final double MIN_PH = 6.5;
     private static final double MAX_PH = 8.5;
     private static final double MAX_TURBIDITY = 5.0; // NTU
 
-    public Map<String, Object> evaluateReading(WaterReadingRequest reading) {
+    public AlertResponse evaluateReading(WaterReadingRequest reading) {
+        if (reading.getPh() == null && reading.getTurbidity() == null) {
+            throw new IllegalArgumentException("At least one reading (pH or turbidity) is required.");
+        }
 
         boolean phOut = false;
         boolean turbOut = false;
-
         double phDelta = 0.0;
         double turbExcess = 0.0;
 
         StringBuilder message = new StringBuilder();
 
-
         if (reading.getPh() != null) {
             double ph = reading.getPh();
             if (ph < MIN_PH || ph > MAX_PH) {
                 phOut = true;
-
-                if (ph < MIN_PH) {
-                    phDelta = MIN_PH - ph;
-                } else {
-                    phDelta = ph - MAX_PH;
-                }
+                phDelta = (ph < MIN_PH) ? MIN_PH - ph : ph - MAX_PH;
                 message.append("pH level is outside the safe range. ");
             }
         }
-
 
         if (reading.getTurbidity() != null) {
             double turbidity = reading.getTurbidity();
@@ -49,10 +41,7 @@ public class AlertService {
             }
         }
 
-
         boolean alert = phOut || turbOut;
-
-
         String severity;
         String status;
 
@@ -64,28 +53,16 @@ public class AlertService {
             if (phOut) violations++;
             if (turbOut) violations++;
 
-
             if (violations == 1 && phDelta < 1.0 && turbExcess < 2.0) {
-
                 severity = "LOW";
             } else if (violations == 1) {
-
                 severity = "MEDIUM";
             } else {
-
                 severity = "HIGH";
             }
-
             status = "POLLUTED";
         }
 
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("alert", alert);
-        result.put("status", status);       // SAFE / POLLUTED
-        result.put("severity", severity);   // SAFE / LOW / MEDIUM / HIGH
-        result.put("message", message.toString().trim());
-
-        return result;
+        return new AlertResponse(alert, status, severity, message.toString().trim());
     }
 }

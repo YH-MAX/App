@@ -1,35 +1,52 @@
 package com.smartwater.backend.dto;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class SensorDataRequest {
 
-    private double ph;
-    private double temperature;
-    private double turbidity;
+    @NotNull(message = "pH value is required")
+    @DecimalMin(value = "0.0", message = "pH cannot be less than 0.0")
+    @DecimalMax(value = "14.0", message = "pH cannot be greater than 14.0")
+    private Double ph;
+
+    @NotNull(message = "Temperature is required")
+    @DecimalMin(value = "-10.0", message = "Temperature is too low")
+    @DecimalMax(value = "100.0", message = "Temperature is too high")
+    private Double temperature;
+
+    @NotNull(message = "Turbidity is required")
+    @DecimalMin(value = "0.0", message = "Turbidity cannot be negative")
+    private Double turbidity;
+
+    @Size(max = 255, message = "Location cannot be longer than 255 characters")
     private String location;
 
-    // ======= getters & setters =======
+    // ===== Getter / Setter =====
 
-    public double getPh() {
+    public Double getPh() {
         return ph;
     }
 
-    public void setPh(double ph) {
+    public void setPh(Double ph) {
         this.ph = ph;
     }
 
-    public double getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
-    public double getTurbidity() {
+    public Double getTurbidity() {
         return turbidity;
     }
 
-    public void setTurbidity(double turbidity) {
+    public void setTurbidity(Double turbidity) {
         this.turbidity = turbidity;
     }
 

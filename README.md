@@ -1,95 +1,491 @@
-#  SDG 6: Clean Water and Sanitation  
-### Empowering Communities Through Smart Water Monitoring
+# 💧 SmartWater Backend
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen?logo=spring-boot" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/Java-17-orange?logo=openjdk" alt="Java 17">
+  <img src="https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql" alt="MySQL">
+  <img src="https://img.shields.io/badge/JWT-Authentication-yellow?logo=json-web-tokens" alt="JWT">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
+</p>
+
+<p align="center">
+  <b>A robust RESTful API backend for the SmartWater Monitoring System</b><br>
+  Powering real-time water quality monitoring, alerts, and community engagement
+</p>
 
 ---
 
-##  Project Overview
+## 📋 Table of Contents
 
-The app acts as an **early-warning and data-collection tool** that contributes to improving water quality.  
-It empowers individuals or community groups to monitor local water bodies (rivers, lakes, streams) in real time.  
-Users can detect sudden drops in quality, which may indicate a pollution event.  
-The app can log this data with a timestamp and (optionally) a GPS location, creating a record that can be reported to local authorities or environmental organizations.  
-
-This directly supports the **“reducing pollution”** and **“minimizing release of hazardous chemicals”** targets under **SDG 6.3**.
-
----
-
-##  Goal
-
-The goal is to improve water quality by reducing pollution, eliminating dumping and minimizing release of hazardous chemicals and materials, halving the proportion of untreated wastewater and substantially increasing recycling and safe reuse globally. 
----
-
-##  System Requirements
-
-**At least 5 modules** and **3 functional requirements** are required.  
-Include **2 non-functional requirements** with justifications.
+- [Overview](#-overview)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Features](#-features)
+- [API Endpoints](#-api-endpoints)
+- [Getting Started](#-getting-started)
+- [Configuration](#-configuration)
+- [Project Structure](#-project-structure)
+- [Demo Walkthrough](#-demo-walkthrough)
 
 ---
 
-##  Module 1: User Authentication and Profile Management 
+## 🌊 Overview
 
-**Functional Requirements:**
-1. The user shall be able to register an account using an email address and password. 
+SmartWater Backend is the core API service for our water quality monitoring platform. It provides:
 
-2. The user shall be able to log in and log out of the application securely. 
+- **User Authentication** with JWT tokens and email verification
+- **Real-time Sensor Data** integration with FastAPI IoT service
+- **Alert System** for water quality threshold monitoring
+- **Community Platform** for users to share reports and updates
+- **Pollution Reporting** with status tracking
 
-3. The user shall be able to view and update personal details such as name, and  	ccontact.   
-
----
-
-##  Module 2:Bluetooth Data Collection 
-**Functional Requirements:**
-1. The user shall be able to pair and connect the app with the water monitoring device using Bluetooth. 
-
-2. The app shall automatically receive and display sensor readings such as pH level, and temperature in real time. 
-
-3. The app shall notify the user if the Bluetooth connection is lost or if data transmission fails. 
+The backend serves both our **Android mobile app** and integrates with a **FastAPI sensor data service** for IoT device communication.
 
 ---
 
-##  Module 3:Monitoring Dashboard 
+## 🏗 Architecture
 
-**Functional Requirements:**
-1. The app shall visualize current and past water quality data through charts and color-coded indicators. 
-
-2. The app shall allow users to view detailed statistics for each recorded session, including timestamp and location. 
-
-3. The app shall classify water quality status (e.g., Safe, Moderate, Polluted) based on predefined thresholds. 
-
----
-
-##  Module 4: Alert and Reporting System
-
-**Functional Requirements:**
-1. The app shall generate an alert when water quality parameters exceed safe levels. 
-
-2. The user shall be able to submit a pollution report with description and optional photos. 
-
-3. The app shall store all reports in the database and allow viewing of report history. 
-
----
-
-##  Module 5:Real-Time Chat & Community Platform
-
-**Functional Requirements:**
-1. Users from different locations shall be able to chat or post updates about local water quality in real time, like a social feed. 
-
-2. Users shall be able to attach photos, short text, or water sensor readings in their posts to report local conditions. 
-
-3. The app shall allow experts or authorized users to reply to community posts and provide verified guidance or recommendations. 
-
----
-
-##  Non-Functional Requirements
-
-###  Performance
-The system shall display updated water quality readings within **__ seconds** after receiving data from the Bluetooth device.
-
-###  Reliability / Security
-The app shall ensure that user data and GPS location are securely stored and transmitted using encryption methods to protect user privacy.
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           Mobile App (Android)                         │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │ HTTPS/REST
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        SmartWater Backend (Spring Boot)                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │   User      │  │   Sensor    │  │  Community  │  │   Alert     │   │
+│  │ Controller  │  │ Controller  │  │ Controller  │  │ Controller  │   │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │
+│         │                │                │                │          │
+│  ┌──────▼──────────────▼────────────────▼────────────────▼──────┐   │
+│  │                     Service Layer                              │   │
+│  │  • UserService    • FastApiClient    • CommunityService       │   │
+│  │  • EmailService   • AlertService     • FollowService          │   │
+│  └───────────────────────────┬────────────────────────────────────┘   │
+│                              │                                         │
+│  ┌───────────────────────────▼───────────────────────────────────┐   │
+│  │                    Security Layer (JWT)                        │   │
+│  │  • JwtAuthenticationFilter  • BCrypt Password Encoding         │   │
+│  └────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+            │                              │
+            ▼                              ▼
+┌───────────────────────┐     ┌───────────────────────────────────┐
+│    MySQL Database     │     │  FastAPI Sensor Service (Python)  │
+│  • Users              │     │  • Real-time sensor data          │
+│  • Posts, Replies     │     │  • Device management              │
+│  • Alerts, Reports    │     │  • Time-series data               │
+└───────────────────────┘     └───────────────────────────────────┘
+```
 
 ---
 
- *This document outlines the functional and non-functional requirements for the Smart Water Monitoring App aligned with SDG 6: Clean Water and Sanitation.*
+## 🛠 Tech Stack
 
+| Technology | Purpose |
+|------------|---------|
+| **Spring Boot 3.5.7** | Core framework |
+| **Spring Security** | Authentication & Authorization |
+| **Spring Data JPA** | Database ORM |
+| **JWT (jjwt 0.11.5)** | Token-based authentication |
+| **MySQL 8.0** | Primary database |
+| **Spring Mail** | Email verification & password reset |
+| **WebFlux/WebClient** | Async HTTP calls to FastAPI |
+| **Lombok** | Reduce boilerplate code |
+| **Gradle** | Build tool |
 
+---
+
+## ✨ Features
+
+### 🔐 User Authentication & Management
+- JWT-based stateless authentication
+- Email verification with token
+- Password reset via email
+- User profile management (avatar, bio, location)
+- BCrypt password encryption
+
+### 📊 Sensor Data Integration
+- Proxy to FastAPI sensor service
+- Real-time device data (`/device/{deviceId}/latest`)
+- Time-range queries (`/me/range`)
+- Water quality summary statistics
+
+### 🚨 Alert System
+- Automatic alert generation based on thresholds
+- pH level monitoring (critical: < 6.0 or > 8.5)
+- Temperature monitoring (warning: > 30°C)
+- Severity levels: LOW, MEDIUM, HIGH
+- User alert history
+
+### 🗣 Community Platform (Twitter-like)
+- Create posts with location tags
+- Like, Bookmark, Retweet functionality
+- Quote tweets with comments
+- Reply to posts
+- Search posts
+- User feed with pagination
+
+### 👥 Social Features
+- Follow/Unfollow users
+- Followers & Following lists
+- User profile pages
+- Pagination support
+
+### 📝 Pollution Reporting
+- Submit pollution reports with photos
+- Location-based reporting
+- Admin status updates (PENDING → RESOLVED)
+- Auto-generated reports on HIGH severity alerts
+
+### 📶 Bluetooth Device Management
+- Pair IoT sensor devices
+- Connection status tracking
+- Device list per user
+
+### 🔗 FastAPI Gateway Proxy
+- Direct proxy to FastAPI sensor service
+- Latest readings endpoint
+- Historical data with range queries
+
+---
+
+## 📡 API Endpoints
+
+### Authentication (`/api/users`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/register` | Register new user | ❌ |
+| POST | `/login` | Login & get JWT | ❌ |
+| POST | `/logout` | Logout | ✅ |
+| GET | `/verify-email?token=xxx` | Verify email | ❌ |
+| POST | `/forgot-password` | Request password reset | ❌ |
+| POST | `/reset-password` | Reset password | ❌ |
+| GET | `/me` | Get current user profile | ✅ |
+| PUT | `/me` | Update profile | ✅ |
+
+### Sensor Data (`/api/sensor`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/device/{deviceId}/latest` | Get latest device reading | ❌ |
+| GET | `/me/latest` | Get user's latest reading | ✅ |
+| GET | `/me/range?from=&to=` | Get readings in time range | ✅ |
+| GET | `/me/summary?from=&to=` | Get water quality summary | ✅ |
+| POST | `/upload` | Upload sensor data | ✅ |
+
+### Alerts (`/api/alerts`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/evaluate` | Evaluate water reading | ✅ |
+| GET | `/me` | Get user's alert history | ✅ |
+| GET | `/` | Get all alerts (admin) | ✅ |
+
+### Community (`/api/community`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/posts` | Create a post | ✅ |
+| GET | `/posts` | Get feed (paginated) | ✅ |
+| GET | `/posts/{id}` | Get post by ID | ✅ |
+| POST | `/posts/{id}/like` | Toggle like | ✅ |
+| POST | `/posts/{id}/bookmark` | Toggle bookmark | ✅ |
+| POST | `/posts/{id}/retweet` | Retweet | ✅ |
+| DELETE | `/posts/{id}/retweet` | Undo retweet | ✅ |
+| POST | `/posts/{id}/quote` | Quote tweet | ✅ |
+| POST | `/posts/{id}/replies` | Add reply | ✅ |
+| GET | `/posts/{id}/replies` | Get replies | ✅ |
+| GET | `/search?query=xxx` | Search posts | ✅ |
+| GET | `/bookmarks` | Get bookmarks | ✅ |
+| GET | `/likes` | Get liked posts | ✅ |
+
+### Reports (`/api/reports`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/` | Create pollution report | ✅ |
+| GET | `/me` | Get my reports | ✅ |
+| GET | `/` | Get all reports | ✅ |
+| PUT | `/{id}/status` | Update status (admin) | ✅ |
+
+### Social (`/api/users`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/{userId}/follow` | Follow user | ✅ |
+| DELETE | `/{userId}/follow` | Unfollow user | ✅ |
+| GET | `/{userId}/followers` | Get followers | ✅ |
+| GET | `/{userId}/following` | Get following | ✅ |
+| GET | `/{userId}/profile` | Get user profile | ✅ |
+| GET | `/me/profile` | Get my profile | ✅ |
+
+### Bluetooth Devices (`/api/bluetooth`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/pair` | Pair a new device | ✅ |
+| POST | `/status` | Update connection status | ✅ |
+| GET | `/me/devices` | Get user's paired devices | ✅ |
+
+### Water Gateway (`/api/water`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/latest` | Get latest reading (proxy) | ❌ |
+| GET | `/history?range=&value=` | Get history (proxy) | ❌ |
+| GET | `/test-connection` | Test FastAPI connection | ❌ |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Java 17** or higher
+- **MySQL 8.0** database
+- **Gradle** (wrapper included)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/SmartWaterBackend.git
+cd SmartWaterBackend
+```
+
+### 2. Configure Database
+
+Create a MySQL database:
+
+```sql
+CREATE DATABASE smartwater_db;
+```
+
+### 3. Update Configuration
+
+Edit `src/main/resources/application.properties`:
+
+```properties
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/smartwater_db
+spring.datasource.username=root
+spring.datasource.password=your_password
+
+# JWT Secret (change in production!)
+jwt.secret=your-secure-secret-key-here
+
+# Email (for verification)
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-password
+```
+
+### 4. Run the Application
+
+```bash
+# Windows
+./gradlew.bat bootRun
+
+# macOS/Linux
+./gradlew bootRun
+```
+
+The server will start at `http://localhost:8080`
+
+### 5. Verify Installation
+
+```bash
+curl http://localhost:8080/actuator/health
+# Response: {"status":"UP"}
+```
+
+---
+
+## ⚙️ Configuration
+
+### Key Properties
+
+| Property | Description | Default |
+|----------|-------------|---------|
+| `server.port` | Server port | 8080 |
+| `jwt.secret` | JWT signing key | (required) |
+| `jwt.expiration` | Token expiry (ms) | 86400000 (24h) |
+| `fastapi.base-url` | FastAPI sensor service | http://localhost:8888 |
+| `spring.jpa.hibernate.ddl-auto` | Schema generation | update |
+
+### Email Configuration
+
+For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833):
+
+```properties
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-16-char-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+```
+
+---
+
+## 📁 Project Structure
+
+```
+src/main/java/com/smartwater/backend/
+├── SmartWaterBackendApplication.java  # Main entry point
+├── config/
+│   └── SecurityConfig.java            # Spring Security & JWT config
+├── controller/
+│   ├── UserController.java            # Auth & user management
+│   ├── SensorController.java          # Sensor data proxy
+│   ├── CommunityController.java       # Posts, likes, replies
+│   ├── AlertController.java           # Alert evaluation
+│   ├── FollowController.java          # Social features
+│   ├── PollutionReportController.java # Pollution reports
+│   ├── BluetoothController.java       # IoT device pairing
+│   └── WaterProxyController.java      # FastAPI gateway proxy
+├── dto/                                # Data Transfer Objects
+├── exception/                          # Custom exceptions
+├── integration/
+│   └── FastApiSensorClient.java       # FastAPI integration
+├── model/                              # JPA Entities
+│   ├── User.java
+│   ├── CommunityPost.java
+│   ├── Alert.java
+│   └── ...
+├── repository/                         # JPA Repositories
+├── security/
+│   ├── JwtUtil.java                   # JWT token utilities
+│   └── JwtAuthenticationFilter.java   # Request filter
+└── service/                            # Business logic
+```
+
+---
+
+## 🎥 Demo Walkthrough
+
+### For Video Demonstration
+
+Here's a suggested flow for demonstrating the backend:
+
+#### 1. **Authentication Flow** (2 min)
+```bash
+# Register a new user
+POST /api/users/register
+{
+  "email": "demo@example.com",
+  "password": "password123",
+  "username": "DemoUser"
+}
+
+# Login and get JWT
+POST /api/users/login
+{
+  "email": "demo@example.com",
+  "password": "password123"
+}
+# Returns: { "token": "eyJhbG..." }
+```
+
+#### 2. **Sensor Data Integration** (2 min)
+```bash
+# Get latest device reading (no auth)
+GET /api/sensor/device/WATER_001/latest
+
+# Get user's readings with auth
+GET /api/sensor/me/range?from=2026-01-01T00:00:00&to=2026-01-14T23:59:59
+Authorization: Bearer <token>
+```
+
+#### 3. **Alert System** (2 min)
+```bash
+# Evaluate a water reading
+POST /api/alerts/evaluate
+Authorization: Bearer <token>
+{
+  "ph": 5.5,          # Critical: pH < 6.0
+  "temperature": 35,   # Warning: temp > 30
+  "turbidity": 10
+}
+# Returns alert with severity and message
+```
+
+#### 4. **Community Features** (3 min)
+```bash
+# Create a post
+POST /api/community/posts
+{
+  "content": "Water quality excellent at City Lake! 💧",
+  "location": "City Lake"
+}
+
+# Like a post
+POST /api/community/posts/1/like
+
+# Add a reply
+POST /api/community/posts/1/replies
+{
+  "content": "Great news! Thanks for sharing!"
+}
+```
+
+#### 5. **Social Features** (2 min)
+```bash
+# Follow a user
+POST /api/users/2/follow
+
+# Get followers
+GET /api/users/1/followers
+
+# Get user profile
+GET /api/users/me/profile
+```
+
+---
+
+## 📊 Database Schema
+
+The system uses the following main tables:
+
+- `users` - User accounts
+- `community_posts` - Community posts
+- `community_replies` - Post replies
+- `post_likes` - Like records
+- `post_bookmarks` - Bookmark records
+- `post_retweets` - Retweet records
+- `user_follows` - Follow relationships
+- `alerts` - Alert history
+- `pollution_reports` - Pollution reports
+- `bluetooth_devices` - Paired IoT devices
+- `sensor_data` - Sensor readings
+- `email_verification_tokens` - Email verification
+- `password_reset_tokens` - Password reset
+
+---
+
+## 🔒 Security Notes
+
+- All passwords are hashed with **BCrypt**
+- JWT tokens expire after **24 hours**
+- CORS is configured for development (allow all origins)
+- Sensitive endpoints require authentication
+- Email verification is required for new accounts
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+**SmartWater Team**
+
+---
+
+<p align="center">
+  Made with ❤️ for cleaner water
+</p>

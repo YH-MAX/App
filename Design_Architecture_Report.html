@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartWater Monitoring System - Design Architecture Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1565C0;
+            font-size: 28px;
+            border-bottom: 3px solid #1565C0;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #1976D2;
+            font-size: 22px;
+            margin-top: 35px;
+            border-left: 4px solid #42A5F5;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #2196F3;
+            font-size: 18px;
+            margin-top: 25px;
+        }
+
+        h4 {
+            color: #42A5F5;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .cover-page {
+            text-align: center;
+            page-break-after: always;
+            padding: 100px 0;
+        }
+
+        .cover-page h1 {
+            font-size: 36px;
+            color: #0D47A1;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .cover-page .subtitle {
+            font-size: 20px;
+            color: #1976D2;
+            margin-bottom: 50px;
+        }
+
+        .cover-page .info {
+            margin-top: 100px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .toc h2 {
+            text-align: center;
+            border: none;
+            padding: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .architecture-diagram {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            border: 2px solid #1976D2;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        .component-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .component-box h4 {
+            margin-top: 0;
+            color: #1565C0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        th {
+            background: #1976D2;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 10px 12px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .layer {
+            margin: 20px 0;
+            padding: 20px;
+            border-left: 4px solid;
+            background: #fafafa;
+        }
+
+        .layer-presentation {
+            border-color: #E91E63;
+        }
+
+        .layer-business {
+            border-color: #9C27B0;
+        }
+
+        .layer-data {
+            border-color: #673AB7;
+        }
+
+        .layer-infrastructure {
+            border-color: #3F51B5;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: #E3F2FD;
+            color: #1565C0;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin: 3px;
+            font-size: 13px;
+        }
+
+        .highlight-box {
+            background: #E8F5E9;
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: #FFF3E0;
+            border: 1px solid #FF9800;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        ul,
+        ol {
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>💧 SmartWater Monitoring System</h1>
+        <div class="subtitle">Design Architecture Report</div>
+        <p style="font-size: 18px; color: #444;">
+            A Comprehensive Technical Architecture Document<br>
+            for the Water Quality Monitoring Platform
+        </p>
+        <div class="info">
+            <p><strong>Document Type:</strong> System Architecture Report</p>
+            <p><strong>Date:</strong> January 23, 2026</p>
+            <p><strong>Version:</strong> 1.0</p>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><strong>1.</strong> System Overview</li>
+            <li><strong>2.</strong> High-Level Architecture Diagram</li>
+            <li><strong>3.</strong> Three-Tier Architecture</li>
+            <li><strong>4.</strong> Component Architecture</li>
+            <li style="padding-left: 40px;">4.1 Android Mobile Application</li>
+            <li style="padding-left: 40px;">4.2 Spring Boot Backend</li>
+            <li style="padding-left: 40px;">4.3 FastAPI IoT Service</li>
+            <li><strong>5.</strong> Data Flow Architecture</li>
+            <li><strong>6.</strong> Security Architecture</li>
+            <li><strong>7.</strong> Database Architecture</li>
+            <li><strong>8.</strong> API Architecture</li>
+            <li><strong>9.</strong> Technology Stack Summary</li>
+        </ul>
+    </div>
+
+    <!-- Section 1: System Overview -->
+    <h2>1. System Overview</h2>
+    <p>
+        The SmartWater Monitoring System is a comprehensive IoT-based platform designed to monitor and analyze water
+        quality in real-time. The system employs a <strong>three-tier microservices architecture</strong> that separates
+        concerns across presentation, business logic, and data layers.
+    </p>
+
+    <div class="highlight-box">
+        <strong>Key Objectives:</strong>
+        <ul>
+            <li>Real-time water quality monitoring (pH, Temperature, Turbidity)</li>
+            <li>Automated alert generation for threshold violations</li>
+            <li>Community engagement platform for water quality reporting</li>
+            <li>IoT device management via Bluetooth connectivity</li>
+            <li>Pollution incident reporting and tracking</li>
+        </ul>
+    </div>
+
+    <!-- Section 2: High-Level Architecture Diagram -->
+    <h2 class="page-break">2. High-Level Architecture Diagram</h2>
+    <p>Figure 2.1 illustrates the complete system architecture of the SmartWater Monitoring System, showing the
+        three-tier design with clear separation between presentation, application, and data layers.</p>
+
+    <!-- Professional Academic-Style Architecture Diagram -->
+    <div style="border: 1px solid #333; padding: 25px; margin: 20px 0; background: #fff;">
+        <div style="text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 13px;">Figure 2.1: SmartWater
+            System Architecture</div>
+
+        <!-- Presentation Tier -->
+        <div style="border: 2px solid #000; padding: 15px; margin-bottom: 12px;">
+            <div style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+                Presentation Tier (Android Mobile Application)</div>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <div
+                    style="border: 1px solid #666; padding: 6px 10px; text-align: center; flex: 1; min-width: 70px; font-size: 12px;">
+                    Dashboard</div>
+                <div
+                    style="border: 1px solid #666; padding: 6px 10px; text-align: center; flex: 1; min-width: 70px; font-size: 12px;">
+                    Community</div>
+                <div
+                    style="border: 1px solid #666; padding: 6px 10px; text-align: center; flex: 1; min-width: 70px; font-size: 12px;">
+                    Alerts</div>
+                <div
+                    style="border: 1px solid #666; padding: 6px 10px; text-align: center; flex: 1; min-width: 70px; font-size: 12px;">
+                    Reports</div>
+                <div
+                    style="border: 1px solid #666; padding: 6px 10px; text-align: center; flex: 1; min-width: 70px; font-size: 12px;">
+                    Profile</div>
+            </div>
+            <div style="border: 1px dashed #666; padding: 6px; margin-top: 10px; text-align: center; font-size: 11px;">
+                Network Layer: Retrofit + OkHttp + JWT Interceptor
+            </div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="text-align: center; margin: 6px 0; font-size: 12px;">| REST API / HTTPS |</div>
+        <div style="text-align: center; margin: 2px 0; font-size: 14px;">▼</div>
+
+        <!-- Application Tier -->
+        <div style="border: 2px solid #000; padding: 15px; margin-bottom: 12px;">
+            <div style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+                Application Tier (Spring Boot Backend - Port 8080)</div>
+
+            <div style="border: 1px solid #666; padding: 8px; margin-bottom: 6px;">
+                <div style="font-weight: bold; font-size: 11px; margin-bottom: 4px;">Controller Layer</div>
+                <div style="font-size: 11px;">UserController | SensorController | CommunityController | AlertController
+                    | ReportController | BluetoothController</div>
+            </div>
+
+            <div style="border: 1px solid #666; padding: 8px; margin-bottom: 6px;">
+                <div style="font-weight: bold; font-size: 11px; margin-bottom: 4px;">Service Layer</div>
+                <div style="font-size: 11px;">UserService | CommunityService | AlertService | EmailService |
+                    FastApiSensorFacadeService</div>
+            </div>
+
+            <div style="border: 1px solid #666; padding: 8px; margin-bottom: 6px;">
+                <div style="font-weight: bold; font-size: 11px; margin-bottom: 4px;">Security Layer</div>
+                <div style="font-size: 11px;">JWT Authentication | BCrypt Password Encryption | Spring Security</div>
+            </div>
+
+            <div style="border: 1px solid #666; padding: 8px;">
+                <div style="font-weight: bold; font-size: 11px; margin-bottom: 4px;">Repository Layer</div>
+                <div style="font-size: 11px;">Spring Data JPA Repositories (13 entities)</div>
+            </div>
+        </div>
+
+        <!-- Arrows Split -->
+        <div style="display: flex; justify-content: space-around; margin: 6px 0; font-size: 12px;">
+            <div style="text-align: center;">| JPA/JDBC |<br>▼</div>
+            <div style="text-align: center;">| HTTP/REST |<br>▼</div>
+        </div>
+
+        <!-- Data Tier -->
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <!-- MySQL -->
+            <div style="border: 2px solid #000; padding: 15px; flex: 1; min-width: 220px;">
+                <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+                    Data Tier (MySQL Database)</div>
+                <div style="font-size: 11px; line-height: 1.6;">
+                    • users<br>
+                    • community_posts<br>
+                    • alerts<br>
+                    • pollution_reports<br>
+                    • bluetooth_devices<br>
+                    • user_follows
+                </div>
+            </div>
+
+            <!-- FastAPI -->
+            <div style="border: 2px solid #000; padding: 15px; flex: 1; min-width: 220px;">
+                <div style="font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+                    IoT Service Tier (FastAPI - Port 8888)</div>
+                <div style="font-size: 11px; line-height: 1.6;">
+                    • Real-time sensor data<br>
+                    • Device management<br>
+                    • Time-series queries
+                </div>
+                <div
+                    style="border: 1px solid #666; padding: 5px; margin-top: 8px; text-align: center; font-size: 11px;">
+                    SQLite Database</div>
+                <div style="text-align: center; margin-top: 8px; font-size: 11px;">▲<br>IoT Sensors</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture Summary Table -->
+    <p><strong>Table 2.1:</strong> System Components Summary</p>
+    <table>
+        <tr>
+            <th>Tier</th>
+            <th>Technology</th>
+            <th>Port</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Presentation</td>
+            <td>Android (Java)</td>
+            <td>-</td>
+            <td>Mobile application with Retrofit networking</td>
+        </tr>
+        <tr>
+            <td>Application</td>
+            <td>Spring Boot 3.5.7</td>
+            <td>8080</td>
+            <td>RESTful API backend with JWT authentication</td>
+        </tr>
+        <tr>
+            <td>Data</td>
+            <td>MySQL 8.0</td>
+            <td>3306</td>
+            <td>Primary database for user and application data</td>
+        </tr>
+        <tr>
+            <td>IoT Service</td>
+            <td>Python FastAPI</td>
+            <td>8888</td>
+            <td>Sensor data processing and storage</td>
+        </tr>
+    </table>
+
+    <!-- Section 3: Three-Tier Architecture -->
+    <h2 class="page-break">3. Three-Tier Architecture</h2>
+    <p>The system follows a classic three-tier architecture pattern with clear separation of concerns:</p>
+
+    <div class="layer layer-presentation">
+        <h4>📱 Presentation Layer (Android App)</h4>
+        <ul>
+            <li><strong>Technology:</strong> Native Android (Java)</li>
+            <li><strong>Pattern:</strong> Activity-based architecture with Retrofit networking</li>
+            <li><strong>Responsibilities:</strong>
+                <ul>
+                    <li>User interface rendering and interaction</li>
+                    <li>Local data caching and state management</li>
+                    <li>Bluetooth device connectivity</li>
+                    <li>Real-time data visualization with charts</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layer layer-business">
+        <h4>⚙️ Business Logic Layer (Spring Boot)</h4>
+        <ul>
+            <li><strong>Technology:</strong> Spring Boot 3.5.7 (Java 17)</li>
+            <li><strong>Pattern:</strong> Layered architecture (Controller → Service → Repository)</li>
+            <li><strong>Responsibilities:</strong>
+                <ul>
+                    <li>RESTful API endpoints</li>
+                    <li>Business rule validation and processing</li>
+                    <li>JWT-based authentication and authorization</li>
+                    <li>Integration with IoT data service</li>
+                    <li>Alert generation and notification</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="layer layer-data">
+        <h4>🗄️ Data Layer (MySQL + SQLite)</h4>
+        <ul>
+            <li><strong>Primary Database:</strong> MySQL 8.0 (User data, community, alerts)</li>
+            <li><strong>IoT Database:</strong> SQLite (Time-series sensor data)</li>
+            <li><strong>Pattern:</strong> JPA/Hibernate ORM</li>
+            <li><strong>Responsibilities:</strong>
+                <ul>
+                    <li>Persistent data storage</li>
+                    <li>ACID transaction support</li>
+                    <li>Relational data integrity</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Component Architecture -->
+    <h2 class="page-break">4. Component Architecture</h2>
+
+    <h3>4.1 Android Mobile Application</h3>
+    <div class="component-box">
+        <h4>📱 UI Components (Activities)</h4>
+        <table>
+            <tr>
+                <th>Activity</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td>DashboardActivity</td>
+                <td>Main screen with real-time sensor data, charts, and water quality status</td>
+            </tr>
+            <tr>
+                <td>LoginActivity / RegisterActivity</td>
+                <td>User authentication with JWT token management</td>
+            </tr>
+            <tr>
+                <td>CommunityActivity</td>
+                <td>Twitter-like feed for water quality posts and social interactions</td>
+            </tr>
+            <tr>
+                <td>AlertActivity</td>
+                <td>Display and manage water quality alerts (Critical, Warning, Normal)</td>
+            </tr>
+            <tr>
+                <td>ReportActivity / SubmitReportActivity</td>
+                <td>Pollution incident reporting with photo and location</td>
+            </tr>
+            <tr>
+                <td>BluetoothActivity</td>
+                <td>IoT device pairing and connection management</td>
+            </tr>
+            <tr>
+                <td>ProfileActivity / UpdateProfileActivity</td>
+                <td>User profile management and settings</td>
+            </tr>
+            <tr>
+                <td>MapPickerActivity</td>
+                <td>Location selection using Google Maps</td>
+            </tr>
+        </table>
+
+        <h4>🌐 Network Layer</h4>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>ApiClient</td>
+                <td>Retrofit client configuration with base URL and interceptors</td>
+            </tr>
+            <tr>
+                <td>JwtInterceptor</td>
+                <td>Automatically attaches JWT token to authenticated requests</td>
+            </tr>
+            <tr>
+                <td>TokenStore</td>
+                <td>Secure storage for JWT tokens using SharedPreferences</td>
+            </tr>
+            <tr>
+                <td>AuthApi / WaterApi / CommunityApi / AlertApi</td>
+                <td>Retrofit interface definitions for API endpoints</td>
+            </tr>
+        </table>
+    </div>
+
+    <h3 class="page-break">4.2 Spring Boot Backend</h3>
+    <div class="component-box">
+        <h4>🎮 Controller Layer (8 Controllers)</h4>
+        <table>
+            <tr>
+                <th>Controller</th>
+                <th>Base Path</th>
+                <th>Responsibility</th>
+            </tr>
+            <tr>
+                <td>UserController</td>
+                <td>/api/users</td>
+                <td>Authentication, registration, profile management</td>
+            </tr>
+            <tr>
+                <td>SensorController</td>
+                <td>/api/sensor</td>
+                <td>Sensor data retrieval and upload</td>
+            </tr>
+            <tr>
+                <td>CommunityController</td>
+                <td>/api/community</td>
+                <td>Posts, likes, bookmarks, replies, search</td>
+            </tr>
+            <tr>
+                <td>AlertController</td>
+                <td>/api/alerts</td>
+                <td>Alert evaluation and history</td>
+            </tr>
+            <tr>
+                <td>FollowController</td>
+                <td>/api/users/{id}</td>
+                <td>Follow/unfollow and social connections</td>
+            </tr>
+            <tr>
+                <td>PollutionReportController</td>
+                <td>/api/reports</td>
+                <td>Pollution report CRUD operations</td>
+            </tr>
+            <tr>
+                <td>BluetoothController</td>
+                <td>/api/bluetooth</td>
+                <td>IoT device pairing management</td>
+            </tr>
+            <tr>
+                <td>WaterProxyController</td>
+                <td>/api/water</td>
+                <td>Gateway proxy to FastAPI service</td>
+            </tr>
+        </table>
+
+        <h4>⚙️ Service Layer (12 Services)</h4>
+        <ul>
+            <li><strong>UserService:</strong> User CRUD, authentication logic</li>
+            <li><strong>CommunityService:</strong> Posts, likes, bookmarks, retweets, replies</li>
+            <li><strong>AlertService:</strong> Threshold evaluation, alert generation</li>
+            <li><strong>FollowService:</strong> Social graph management</li>
+            <li><strong>PollutionReportService:</strong> Report lifecycle management</li>
+            <li><strong>BluetoothService:</strong> Device pairing and status tracking</li>
+            <li><strong>EmailService:</strong> SMTP email sending</li>
+            <li><strong>EmailVerificationService:</strong> Email token management</li>
+            <li><strong>PasswordResetService:</strong> Password reset flow</li>
+            <li><strong>FastApiSensorFacadeService:</strong> WebClient calls to FastAPI</li>
+            <li><strong>WaterProxyService:</strong> RestTemplate proxy to FastAPI</li>
+            <li><strong>CustomUserDetailsService:</strong> Spring Security integration</li>
+        </ul>
+
+        <h4>🗃️ Repository Layer (13 JPA Repositories)</h4>
+        <p>JPA repositories for all entity types with custom query methods for pagination, filtering, and relationship
+            traversal.</p>
+    </div>
+
+    <h3 class="page-break">4.3 FastAPI IoT Service</h3>
+    <div class="component-box">
+        <h4>🐍 Python FastAPI Service</h4>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>main.py</td>
+                <td>FastAPI application entry point with route definitions</td>
+            </tr>
+            <tr>
+                <td>continuous_data_sender.py</td>
+                <td>Simulates real-time sensor data generation every 5 seconds</td>
+            </tr>
+            <tr>
+                <td>generate_history.py</td>
+                <td>Generates historical test data for development</td>
+            </tr>
+            <tr>
+                <td>test_simulator.py</td>
+                <td>Comprehensive testing for data simulation</td>
+            </tr>
+            <tr>
+                <td>water_quality.db (SQLite)</td>
+                <td>Local database for time-series sensor storage</td>
+            </tr>
+        </table>
+        <p><strong>Key Endpoints:</strong></p>
+        <ul>
+            <li><code>GET /api/device/{device_id}/latest</code> - Latest sensor reading</li>
+            <li><code>GET /api/me/range?from=&to=</code> - Time-range queries</li>
+            <li><code>POST /api/data/ingest</code> - Receive sensor data</li>
+        </ul>
+    </div>
+
+    <!-- Section 5: Data Flow Architecture -->
+    <h2 class="page-break">5. Data Flow Architecture</h2>
+
+    <div class="architecture-diagram">
+        ┌──────────────────────────────────────────────────────────────────────────────────────────┐
+        │ DATA FLOW DIAGRAM │
+        └──────────────────────────────────────────────────────────────────────────────────────────┘
+
+        1️⃣ SENSOR DATA FLOW (Real-time Monitoring)
+        ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+        │ IoT Sensor │─────▶│ FastAPI │─────▶│Spring Boot │─────▶│ Android App │
+        │ (Simulated) │ POST │ (8888) │ GET │ (8080) │ JSON │ Dashboard │
+        │ │ │ /data/ingest│ │ /api/water │ │ │
+        └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘
+        │
+        ▼
+        ┌─────────────┐
+        │ SQLite │
+        │ Database │
+        └─────────────┘
+
+        2️⃣ AUTHENTICATION FLOW
+        ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+        │ Android App │─────▶│Spring Boot │─────▶│ MySQL │ │ Email │
+        │ Login/ │ POST │ /api/users/ │ │ Database │ │ Service │
+        │ Register │ │ login │ │ │ │ (SMTP) │
+        └─────────────┘ └──────┬──────┘ └─────────────┘ └─────────────┘
+        │ ▲
+        │ JWT Token │
+        ▼ │
+        ┌─────────────┐ │
+        │ TokenStore │◀─────────── Verification ────────┘
+        │ (Android) │
+        └─────────────┘
+
+        3️⃣ ALERT GENERATION FLOW
+        ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+        │ Sensor Data │─────▶│AlertService │─────▶│ MySQL │
+        │ (pH/Temp) │ │ Threshold │ │ alerts │
+        │ │ │ Evaluation │ │ table │
+        └─────────────┘ └──────┬──────┘ └─────────────┘
+        │
+        ┌─────────┴─────────┐
+        ▼ ▼
+        pH < 6.0 or Temp> 30°C
+            pH > 8.5 (WARNING)
+            (CRITICAL)
+
+            4️⃣ COMMUNITY INTERACTION FLOW
+            ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+            │ Android App │─────▶│ Community │─────▶│ MySQL │
+            │ Post/Like/ │ │ Controller │ │ community_ │
+            │ Reply │ │ Service │ │ posts/likes │
+            └─────────────┘ └─────────────┘ └─────────────┘
+    </div>
+
+    <!-- Section 6: Security Architecture -->
+    <h2 class="page-break">6. Security Architecture</h2>
+
+    <div class="architecture-diagram">
+        ┌──────────────────────────────────────────────────────────────────────────────────────────┐
+        │ SECURITY ARCHITECTURE │
+        └──────────────────────────────────────────────────────────────────────────────────────────┘
+
+        ┌─────────────────────────────────────────────────────────────────────────────────────────┐
+        │ ANDROID APPLICATION │
+        │ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ │
+        │ │ TokenStore │───▶│ JwtInterceptor │───▶│ HTTPS Request │ │
+        │ │ (SharedPrefs) │ │ (Attach Token) │ │ + Auth Header │ │
+        │ └─────────────────┘ └─────────────────┘ └─────────────────┘ │
+        └─────────────────────────────────────────────────────────────────────────────────────────┘
+        │
+        ▼
+        ┌─────────────────────────────────────────────────────────────────────────────────────────┐
+        │ SPRING BOOT BACKEND │
+        │ │
+        │ ┌─────────────────────────────── SECURITY FILTER CHAIN ───────────────────────────┐ │
+        │ │ │ │
+        │ │ HTTP Request ──▶ CorsFilter ──▶ JwtAuthenticationFilter ──▶ Controller │ │
+        │ │ │ │ │
+        │ │ ┌──────┴──────┐ │ │
+        │ │ ▼ ▼ │ │
+        │ │ Valid Token Invalid Token │ │
+        │ │ ──────────── ────────────── │ │
+        │ │ Set Security Return 401 │ │
+        │ │ Context Unauthorized │ │
+        │ │ │ │
+        │ └───────────────────────────────────────────────────────────────────────────────────┘ │
+        │ │
+        │ ┌─────────────────────────────── SECURITY COMPONENTS ─────────────────────────────┐ │
+        │ │ ┌────────────────┐ ┌────────────────┐ ┌────────────────┐ │ │
+        │ │ │ JwtUtil │ │ BCrypt │ │ SecurityConfig│ │ │
+        │ │ │ ───────────── │ │ ───────────── │ │ ───────────── │ │ │
+        │ │ │ • Generate │ │ • Password │ │ • Endpoint │ │ │
+        │ │ │ • Validate │ │ Hashing │ │ Security │ │ │
+        │ │ │ • Extract │ │ • Verification │ │ • CORS Config │ │ │
+        │ │ │ Claims │ │ │ │ │ │ │
+        │ │ └────────────────┘ └────────────────┘ └────────────────┘ │ │
+        │ └───────────────────────────────────────────────────────────────────────────────────┘ │
+        │ │
+        │ ┌─────────────────────────────── ENDPOINT SECURITY ───────────────────────────────┐ │
+        │ │ PUBLIC (No Auth Required): │ │
+        │ │ • POST /api/users/register │ │
+        │ │ • POST /api/users/login │ │
+        │ │ • GET /api/users/verify-email │ │
+        │ │ • GET /api/sensor/device/{id}/latest │ │
+        │ │ • GET /api/water/** │ │
+        │ │ │ │
+        │ │ PROTECTED (JWT Required): │ │
+        │ │ • GET/PUT /api/users/me │ │
+        │ │ • ALL /api/community/** (except GET) │ │
+        │ │ • ALL /api/alerts/** │ │
+        │ │ • ALL /api/reports/** (except GET) │ │
+        │ │ • ALL /api/bluetooth/** │ │
+        │ └───────────────────────────────────────────────────────────────────────────────────┘ │
+        └─────────────────────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>Security Features</h3>
+    <table>
+        <tr>
+            <th>Feature</th>
+            <th>Implementation</th>
+        </tr>
+        <tr>
+            <td>Password Encryption</td>
+            <td>BCrypt hashing with salt (Spring Security)</td>
+        </tr>
+        <tr>
+            <td>Token Authentication</td>
+            <td>JWT (JJWT 0.11.5) with 24-hour expiration</td>
+        </tr>
+        <tr>
+            <td>Email Verification</td>
+            <td>Secure token-based verification flow</td>
+        </tr>
+        <tr>
+            <td>Password Reset</td>
+            <td>Time-limited reset tokens via email</td>
+        </tr>
+        <tr>
+            <td>CORS</td>
+            <td>Configured for development (allow all origins)</td>
+        </tr>
+        <tr>
+            <td>HTTPS</td>
+            <td>Transport layer security for all communications</td>
+        </tr>
+    </table>
+
+    <!-- Section 7: Database Architecture -->
+    <h2 class="page-break">7. Database Architecture</h2>
+
+    <div class="architecture-diagram">
+        ┌──────────────────────────────────────────────────────────────────────────────────────────┐
+        │ MySQL DATABASE SCHEMA │
+        │ (smartwater_db - Port 3306) │
+        └──────────────────────────────────────────────────────────────────────────────────────────┘
+
+        ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+        │ users │ │ community_posts │ │community_replies│
+        ├─────────────────┤ ├─────────────────┤ ├─────────────────┤
+        │ id (PK) │◀──┐ │ id (PK) │◀──┐ │ id (PK) │
+        │ email │ │ │ user_id (FK)────│───┘ │ post_id (FK)────│───▶
+        │ password_hash │ │ │ content │ │ │ user_id (FK)────│───▶
+        │ username │ │ │ location │ │ │ content │
+        │ avatar_url │ │ │ created_at │ │ │ created_at │
+        │ bio │ │ │ like_count │ │ └─────────────────┘
+        │ location │ │ │ reply_count │ │
+        │ email_verified │ │ │ retweet_count │ │
+        │ created_at │ │ │ is_quote │ │
+        └─────────────────┘ │ │ quoted_post_id │ │
+        ▲ │ └─────────────────┘ │
+        │ │ │
+        ┌───────┴───────┐ │ ┌─────────────────┐ │ ┌─────────────────┐
+        │ user_follows │ │ │ post_likes │ │ │ post_bookmarks │
+        ├───────────────┤ │ ├─────────────────┤ │ ├─────────────────┤
+        │ id (PK) │ │ │ id (PK) │ │ │ id (PK) │
+        │ follower_id │─────┤ │ user_id (FK)────│───┤ │ user_id (FK)────│───▶
+        │ following_id │─────┘ │ post_id (FK)────│───┘ │ post_id (FK)────│───▶
+        │ created_at │ │ created_at │ │ created_at │
+        └───────────────┘ └─────────────────┘ └─────────────────┘
+
+        ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+        │ alerts │ │pollution_reports│ │bluetooth_devices│
+        ├─────────────────┤ ├─────────────────┤ ├─────────────────┤
+        │ id (PK) │ │ id (PK) │ │ id (PK) │
+        │ user_id (FK) │ │ user_id (FK) │ │ user_id (FK) │
+        │ type │ │ title │ │ device_id │
+        │ severity │ │ description │ │ device_name │
+        │ message │ │ location │ │ status │
+        │ ph_value │ │ photo_url │ │ last_connected │
+        │ temperature │ │ status │ │ created_at │
+        │ created_at │ │ created_at │ └─────────────────┘
+        └─────────────────┘ └─────────────────┘
+
+        ┌─────────────────────────┐ ┌─────────────────────────┐
+        │email_verification_tokens│ │ password_reset_tokens │
+        ├─────────────────────────┤ ├─────────────────────────┤
+        │ id (PK) │ │ id (PK) │
+        │ user_id (FK) │ │ user_id (FK) │
+        │ token │ │ token │
+        │ expiry_date │ │ expiry_date │
+        └─────────────────────────┘ └─────────────────────────┘
+
+        ┌──────────────────────────────────────────────────────────────────────────────────────────┐
+        │ SQLite DATABASE (FastAPI) │
+        │ (water_quality.db - IoT Service) │
+        └──────────────────────────────────────────────────────────────────────────────────────────┘
+
+        ┌─────────────────────────────────────────────────────────────────────────────────────────┐
+        │ sensor_readings │
+        ├─────────────────────────────────────────────────────────────────────────────────────────┤
+        │ id (PK) │ device_id │ ph_value │ temperature │ turbidity │ status │ timestamp │
+        └─────────────────────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <!-- Section 8: API Architecture -->
+    <h2 class="page-break">8. API Architecture</h2>
+
+    <h3>RESTful API Design Principles</h3>
+    <ul>
+        <li><strong>Resource-based URLs:</strong> /api/users, /api/community/posts, /api/alerts</li>
+        <li><strong>HTTP Methods:</strong> GET (read), POST (create), PUT (update), DELETE (remove)</li>
+        <li><strong>JSON Response:</strong> Consistent JSON response format with proper status codes</li>
+        <li><strong>Pagination:</strong> PageResponse DTO for paginated results</li>
+        <li><strong>Error Handling:</strong> GlobalExceptionHandler with ApiError response format</li>
+    </ul>
+
+    <h3>API Endpoint Summary</h3>
+    <table>
+        <tr>
+            <th>Module</th>
+            <th>Endpoints</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Authentication</td>
+            <td>8 endpoints</td>
+            <td>Register, login, logout, verify email, password reset, profile</td>
+        </tr>
+        <tr>
+            <td>Sensor Data</td>
+            <td>5 endpoints</td>
+            <td>Device readings, time-range queries, data upload</td>
+        </tr>
+        <tr>
+            <td>Alerts</td>
+            <td>3 endpoints</td>
+            <td>Evaluate readings, alert history, all alerts</td>
+        </tr>
+        <tr>
+            <td>Community</td>
+            <td>12 endpoints</td>
+            <td>Posts, likes, bookmarks, retweets, replies, search</td>
+        </tr>
+        <tr>
+            <td>Social</td>
+            <td>6 endpoints</td>
+            <td>Follow/unfollow, followers, following, profiles</td>
+        </tr>
+        <tr>
+            <td>Reports</td>
+            <td>4 endpoints</td>
+            <td>Create, view, update status</td>
+        </tr>
+        <tr>
+            <td>Bluetooth</td>
+            <td>3 endpoints</td>
+            <td>Pair device, update status, list devices</td>
+        </tr>
+        <tr>
+            <td>Water Gateway</td>
+            <td>3 endpoints</td>
+            <td>Proxy to FastAPI for sensor data</td>
+        </tr>
+    </table>
+
+    <!-- Section 9: Technology Stack Summary -->
+    <h2 class="page-break">9. Technology Stack Summary</h2>
+
+    <h3>Frontend (Android Application)</h3>
+    <p>
+        <span class="tech-badge">Java</span>
+        <span class="tech-badge">Android SDK 34</span>
+        <span class="tech-badge">Retrofit 2</span>
+        <span class="tech-badge">OkHttp</span>
+        <span class="tech-badge">Gson</span>
+        <span class="tech-badge">MPAndroidChart</span>
+        <span class="tech-badge">Google Maps SDK</span>
+        <span class="tech-badge">Glide</span>
+        <span class="tech-badge">Material Design</span>
+    </p>
+
+    <h3>Backend (Spring Boot)</h3>
+    <p>
+        <span class="tech-badge">Spring Boot 3.5.7</span>
+        <span class="tech-badge">Java 17</span>
+        <span class="tech-badge">Spring Security</span>
+        <span class="tech-badge">Spring Data JPA</span>
+        <span class="tech-badge">JWT (jjwt 0.11.5)</span>
+        <span class="tech-badge">MySQL 8.0</span>
+        <span class="tech-badge">Spring Mail</span>
+        <span class="tech-badge">WebFlux/WebClient</span>
+        <span class="tech-badge">Lombok</span>
+        <span class="tech-badge">Gradle</span>
+    </p>
+
+    <h3>IoT Service (FastAPI)</h3>
+    <p>
+        <span class="tech-badge">Python 3.10+</span>
+        <span class="tech-badge">FastAPI</span>
+        <span class="tech-badge">Uvicorn</span>
+        <span class="tech-badge">SQLite</span>
+        <span class="tech-badge">Pydantic</span>
+    </p>
+
+    <h3>Development & DevOps</h3>
+    <p>
+        <span class="tech-badge">Git</span>
+        <span class="tech-badge">Android Studio</span>
+        <span class="tech-badge">IntelliJ IDEA</span>
+        <span class="tech-badge">VS Code</span>
+        <span class="tech-badge">Postman</span>
+    </p>
+
+    <!-- Statistics -->
+    <h3>Project Statistics</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Files</th>
+            <th>Key Metrics</th>
+        </tr>
+        <tr>
+            <td>Android App</td>
+            <td>~50+ Java files</td>
+            <td>19 Activities, 11 Network APIs, 21 DTOs</td>
+        </tr>
+        <tr>
+            <td>Spring Boot Backend</td>
+            <td>79 Java files</td>
+            <td>8 Controllers, 12 Services, 15 Models, 13 Repositories</td>
+        </tr>
+        <tr>
+            <td>FastAPI Service</td>
+            <td>~10 Python files</td>
+            <td>5 endpoints, SQLite database</td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            <strong>SmartWater Monitoring System - Design Architecture Report</strong><br>
+            Generated on January 23, 2026 | Version 1.0
+        </p>
+    </div>
+</body>
+
+</html>

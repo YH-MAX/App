@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Section 4 & 5 - Simplified</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            margin: 1in;
+        }
+
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 11pt;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 5px 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #d9d9d9;
+        }
+
+        p {
+            margin: 8px 0;
+            text-align: justify;
+        }
+
+        ul,
+        ol {
+            margin: 5px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 3px 0;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 10pt;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>4. System Implementation</h2>
+
+    <div class="diagram">
+        [Android App] ←→ [Spring Boot :8080] ←→ [FastAPI :8888] ←→ [MySQL]
+    </div>
+
+    <h3>4.1 Frontend (Android)</h3>
+
+    <p><strong>Technology:</strong> Java, Android SDK (API 24+), Retrofit 2, MPAndroidChart, Google Maps API</p>
+
+    <p>The app has 18 Activity screens organized into modules:</p>
+
+    <table>
+        <tr>
+            <th>Module</th>
+            <th>Screens</th>
+            <th>Function</th>
+        </tr>
+        <tr>
+            <td>Auth</td>
+            <td>Login, Register</td>
+            <td>JWT login with email verification</td>
+        </tr>
+        <tr>
+            <td>Dashboard</td>
+            <td>DashboardActivity</td>
+            <td>Real-time sensor data, charts (5s refresh)</td>
+        </tr>
+        <tr>
+            <td>Alerts</td>
+            <td>AlertActivity</td>
+            <td>Water quality alerts (HIGH/MEDIUM/LOW)</td>
+        </tr>
+        <tr>
+            <td>Community</td>
+            <td>Community, CreatePost, PostDetail</td>
+            <td>Posts, likes, bookmarks, replies</td>
+        </tr>
+        <tr>
+            <td>Reports</td>
+            <td>Report, SubmitReport, MapPicker</td>
+            <td>Pollution reporting with location</td>
+        </tr>
+        <tr>
+            <td>Profile</td>
+            <td>Profile, UpdateProfile, UserProfile</td>
+            <td>User profiles and following</td>
+        </tr>
+    </table>
+
+    <p><strong>Network Layer:</strong> Uses Retrofit with JWT interceptor. API interfaces: AuthApi, WaterApi, AlertApi,
+        CommunityApi, ReportApi, BluetoothApi.</p>
+
+    <h3>4.2 Backend (Spring Boot)</h3>
+
+    <p><strong>Technology:</strong> Spring Boot 3.5.7, Spring Security + JWT, Spring Data JPA, MySQL 8.0, Java 17</p>
+
+    <p><strong>Architecture:</strong> Three-tier (Controllers → Services → Repositories)</p>
+
+    <table>
+        <tr>
+            <th>Module</th>
+            <th>Function</th>
+        </tr>
+        <tr>
+            <td>Authentication</td>
+            <td>JWT login, registration, email verification, password reset</td>
+        </tr>
+        <tr>
+            <td>Sensor Data</td>
+            <td>Proxy to FastAPI for real-time water readings</td>
+        </tr>
+        <tr>
+            <td>Alerts</td>
+            <td>Evaluate pH/turbidity thresholds, generate severity levels</td>
+        </tr>
+        <tr>
+            <td>Community</td>
+            <td>Posts, likes, bookmarks, replies, follow system</td>
+        </tr>
+        <tr>
+            <td>Reports</td>
+            <td>Pollution reports with status tracking</td>
+        </tr>
+    </table>
+
+    <p><strong>API Endpoints:</strong> 45+ REST endpoints across 8 groups (/api/users, /api/sensor, /api/water,
+        /api/alerts, /api/community, /api/reports, /api/bluetooth)</p>
+
+    <p><strong>Security:</strong> JWT with 24h expiration, BCrypt password hashing, email verification required</p>
+
+    <h3>4.3 Statistics</h3>
+
+    <table>
+        <tr>
+            <th>Frontend</th>
+            <th>Count</th>
+            <th>Backend</th>
+            <th>Count</th>
+        </tr>
+        <tr>
+            <td>Activities</td>
+            <td>18</td>
+            <td>Java Files</td>
+            <td>79</td>
+        </tr>
+        <tr>
+            <td>API Interfaces</td>
+            <td>6</td>
+            <td>Controllers</td>
+            <td>8</td>
+        </tr>
+        <tr>
+            <td>DTOs</td>
+            <td>21</td>
+            <td>Services</td>
+            <td>12</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td>Database Tables</td>
+            <td>13</td>
+        </tr>
+    </table>
+
+    <!-- TESTING SECTION -->
+
+    <h2>5. Testing And Validation</h2>
+
+    <h3>5.1 API Testing</h3>
+
+    <p>We tested the backend APIs using IntelliJ HTTP Client:</p>
+
+    <table>
+        <tr>
+            <th>API</th>
+            <th>Test</th>
+            <th>Result</th>
+        </tr>
+        <tr>
+            <td>Login</td>
+            <td>Submit credentials, receive JWT</td>
+            <td>Works</td>
+        </tr>
+        <tr>
+            <td>Sensor Data</td>
+            <td>Fetch latest reading from WATER_001</td>
+            <td>Works</td>
+        </tr>
+        <tr>
+            <td>Alert</td>
+            <td>Submit low pH (5.2), check severity</td>
+            <td>Works - HIGH</td>
+        </tr>
+        <tr>
+            <td>Community</td>
+            <td>Create and view posts</td>
+            <td>Works</td>
+        </tr>
+    </table>
+
+    <h3>5.2 Security Testing</h3>
+
+    <ul>
+        <li>Access without token → 403 Forbidden ✓</li>
+        <li>Expired token → 401 Unauthorized ✓</li>
+        <li>Valid token → Data returned ✓</li>
+        <li>Passwords stored as BCrypt hashes ✓</li>
+    </ul>
+
+    <h3>5.3 End-to-End Testing</h3>
+
+    <p>We tested complete user flows on a real Android phone:</p>
+
+    <ol>
+        <li><strong>Registration Flow:</strong> Register → Email verification → Login → Dashboard ✓</li>
+        <li><strong>Monitoring Flow:</strong> View dashboard → Data refreshes every 5s → Alerts appear when pH < 6.5
+                ✓</li>
+        <li><strong>Community Flow:</strong> Create post → View in feed → Like/bookmark ✓</li>
+        <li><strong>Report Flow:</strong> Submit pollution report with location → Appears in "My Reports" ✓</li>
+    </ol>
+
+    <h3>5.4 Issues Fixed</h3>
+
+    <ul>
+        <li>Community/Reports returned 403 for GET → Fixed SecurityConfig to allow public GET</li>
+        <li>App couldn't connect on real phone → Changed localhost to actual server IP</li>
+        <li>Dashboard not updating → Need to start FastAPI before using app</li>
+    </ul>
+
+    <h3>5.5 Conclusion</h3>
+
+    <p>All features tested successfully. The system works when Android App, Spring Boot, FastAPI, and MySQL are running
+        together.</p>
+
+</body>
+
+</html>

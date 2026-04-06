@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Appendix - Backend Documentation</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            margin: 0.8in;
+            color: #000;
+        }
+
+        h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        h4 {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 12px;
+            margin-bottom: 5px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 10pt;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 5px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            background-color: #f0f0f0;
+            padding: 1px 4px;
+        }
+
+        p {
+            margin: 6px 0;
+            text-align: justify;
+        }
+
+        ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 3px 0;
+        }
+
+        .diagram {
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .endpoint-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Appendix A: Backend Documentation</h1>
+
+    <!-- ============================================= -->
+    <!-- SECTION A.1: COMPLETE API DOCUMENTATION      -->
+    <!-- ============================================= -->
+
+    <h2>A.1 Complete API Documentation</h2>
+
+    <h3>A.1.1 Authentication APIs</h3>
+
+    <h4>POST /api/users/register</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Register a new user account<br>
+        <strong>Authentication:</strong> Not required<br>
+        <strong>Request Body:</strong>
+        <pre>{
+    "email": "user@example.com",
+    "password": "password123",
+    "username": "JohnDoe"
+}</pre>
+        <strong>Response (201 Created):</strong>
+        <pre>{
+    "id": 1,
+    "email": "user@example.com",
+    "username": "JohnDoe",
+    "emailVerified": false,
+    "message": "Verification email sent"
+}</pre>
+    </div>
+
+    <h4>POST /api/users/login</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Authenticate user and receive JWT token<br>
+        <strong>Authentication:</strong> Not required<br>
+        <strong>Request Body:</strong>
+        <pre>{
+    "email": "user@example.com",
+    "password": "password123"
+}</pre>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "email": "user@example.com",
+        "username": "JohnDoe"
+    }
+}</pre>
+    </div>
+
+    <h4>GET /api/users/verify-email?token=xxx</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Verify email with token from verification link<br>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "message": "Email verified successfully"
+}</pre>
+    </div>
+
+    <h4>GET /api/users/me/profile</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Get current user's profile<br>
+        <strong>Authentication:</strong> Bearer Token required<br>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "id": 1,
+    "username": "JohnDoe",
+    "email": "user@example.com",
+    "avatarUrl": "https://...",
+    "bio": "Water quality enthusiast",
+    "location": "Kuala Lumpur",
+    "followersCount": 10,
+    "followingCount": 5,
+    "postsCount": 15
+}</pre>
+    </div>
+
+    <h3>A.1.2 Sensor Data APIs</h3>
+
+    <h4>GET /api/sensor/device/{deviceId}/latest</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Get latest sensor reading for a device<br>
+        <strong>Authentication:</strong> Not required (public endpoint)<br>
+        <strong>Example:</strong> <code>GET /api/sensor/device/WATER_001/latest</code><br>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "deviceId": "WATER_001",
+    "ph": 7.2,
+    "temperature": 25.5,
+    "turbidity": 3.2,
+    "status": "SAFE",
+    "timestamp": "2026-01-21T15:30:00"
+}</pre>
+    </div>
+
+    <h4>GET /api/sensor/me/range?from=&to=</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Get sensor readings within time range<br>
+        <strong>Authentication:</strong> Bearer Token required<br>
+        <strong>Example:</strong>
+        <code>GET /api/sensor/me/range?from=2026-01-01T00:00:00&to=2026-01-21T23:59:59</code><br>
+        <strong>Response (200 OK):</strong>
+        <pre>[
+    {
+        "ph": 7.1, "temperature": 24.5, "turbidity": 2.8,
+        "timestamp": "2026-01-21T10:00:00"
+    },
+    {
+        "ph": 7.3, "temperature": 25.0, "turbidity": 3.0,
+        "timestamp": "2026-01-21T11:00:00"
+    }
+]</pre>
+    </div>
+
+    <h3>A.1.3 Alert APIs</h3>
+
+    <h4>POST /api/alerts/evaluate</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Evaluate water quality and generate alert<br>
+        <strong>Authentication:</strong> Bearer Token required<br>
+        <strong>Request Body:</strong>
+        <pre>{
+    "ph": 5.2,
+    "temperature": 35,
+    "turbidity": 8,
+    "location": "River Station A"
+}</pre>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "id": 1,
+    "alert": true,
+    "status": "POLLUTED",
+    "severity": "HIGH",
+    "message": "pH level is outside the safe range. Turbidity is too high.",
+    "phValue": 5.2,
+    "temperature": 35,
+    "turbidity": 8,
+    "timestamp": "2026-01-21T15:30:00"
+}</pre>
+    </div>
+
+    <h3>A.1.4 Community APIs</h3>
+
+    <h4>POST /api/community/posts</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Create a new community post<br>
+        <strong>Authentication:</strong> Bearer Token required<br>
+        <strong>Request Body:</strong>
+        <pre>{
+    "content": "Water quality report: Excellent conditions today!",
+    "location": "City Lake"
+}</pre>
+        <strong>Response (201 Created):</strong>
+        <pre>{
+    "id": 1,
+    "content": "Water quality report: Excellent conditions today!",
+    "location": "City Lake",
+    "authorId": 1,
+    "authorUsername": "JohnDoe",
+    "likeCount": 0,
+    "replyCount": 0,
+    "createdAt": "2026-01-21T15:30:00"
+}</pre>
+    </div>
+
+    <h4>POST /api/community/posts/{id}/like</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Toggle like on a post<br>
+        <strong>Authentication:</strong> Bearer Token required<br>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "liked": true,
+    "likeCount": 5
+}</pre>
+    </div>
+
+    <h3>A.1.5 Water Gateway APIs (FastAPI Proxy)</h3>
+
+    <h4>GET /api/water/latest</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Get latest reading via FastAPI proxy<br>
+        <strong>Authentication:</strong> Not required<br>
+        <strong>Response:</strong> Proxied from FastAPI :8888
+    </div>
+
+    <h4>GET /api/water/test-connection</h4>
+    <div class="endpoint-box">
+        <strong>Description:</strong> Test FastAPI service connectivity<br>
+        <strong>Response (200 OK):</strong>
+        <pre>{
+    "status": "connected",
+    "fastApiUrl": "http://localhost:8888"
+}</pre>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SECTION A.2: KEY CODE IMPLEMENTATIONS        -->
+    <!-- ============================================= -->
+
+    <h2 class="page-break">A.2 Key Code Implementations</h2>
+
+    <h3>A.2.1 JWT Token Utility (JwtUtil.java)</h3>
+
+    <pre>@Component
+public class JwtUtil {
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private Long expirationMs;
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractAllClaims(token).getExpiration().before(new Date());
+    }
+}</pre>
+
+    <h3>A.2.2 Alert Evaluation Logic (AlertService.java)</h3>
+
+    <pre>@Service
+public class AlertService {
+
+    private static final double MIN_PH = 6.5;
+    private static final double MAX_PH = 8.5;
+    private static final double MAX_TURBIDITY = 5.0; // NTU
+
+    public AlertResponse evaluateReading(WaterReadingRequest reading) {
+        boolean phOut = false;
+        boolean turbOut = false;
+        StringBuilder message = new StringBuilder();
+
+        if (reading.getPh() != null) {
+            double ph = reading.getPh();
+            if (ph < MIN_PH || ph > MAX_PH) {
+                phOut = true;
+                message.append("pH level is outside the safe range. ");
+            }
+        }
+
+        if (reading.getTurbidity() != null) {
+            double turbidity = reading.getTurbidity();
+            if (turbidity > MAX_TURBIDITY) {
+                turbOut = true;
+                message.append("Turbidity is too high. ");
+            }
+        }
+
+        boolean alert = phOut || turbOut;
+        String severity = determineSeverity(phOut, turbOut);
+        String status = alert ? "POLLUTED" : "SAFE";
+
+        return new AlertResponse(alert, status, severity, message.toString().trim());
+    }
+}</pre>
+
+    <h3>A.2.3 Security Configuration (SecurityConfig.java)</h3>
+
+    <pre>@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sess -> 
+                sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                // Public endpoints
+                .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+                .requestMatchers("/api/water/**").permitAll()
+                .requestMatchers("/api/sensor/device/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/community/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reports/**").permitAll()
+                // Protected endpoints
+                .requestMatchers("/api/sensor/me/**").authenticated()
+                .requestMatchers("/api/alerts/**").authenticated()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, 
+                UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}</pre>
+
+    <!-- ============================================= -->
+    <!-- SECTION A.3: DATABASE ER DIAGRAM             -->
+    <!-- ============================================= -->
+
+    <h2 class="page-break">A.3 Database Entity Relationship Diagram</h2>
+
+    <div class="diagram">
+        <pre style="text-align: left; display: inline-block;">
+                                    ┌─────────────────────┐
+                                    │       users         │
+                                    ├─────────────────────┤
+                                    │ id (PK)             │
+                                    │ email (UNIQUE)      │
+                                    │ username            │
+                                    │ password (BCrypt)   │
+                                    │ avatar_url          │
+                                    │ bio                 │
+                                    │ location            │
+                                    │ email_verified      │
+                                    │ created_at          │
+                                    └──────────┬──────────┘
+                                               │
+       ┌───────────────┬───────────────┬───────┼───────┬───────────────┬───────────────┐
+       │               │               │       │       │               │               │
+       ▼               ▼               ▼       ▼       ▼               ▼               ▼
+┌─────────────┐ ┌─────────────┐ ┌───────────┐ ┌─────────┐ ┌─────────────┐ ┌───────────────┐
+│ community   │ │ user_follows│ │  alerts   │ │bluetooth│ │ pollution   │ │ email_verify  │
+│ _posts      │ ├─────────────┤ ├───────────┤ │_devices │ │ _reports    │ │ _tokens       │
+├─────────────┤ │ id (PK)     │ │ id (PK)   │ ├─────────┤ ├─────────────┤ ├───────────────┤
+│ id (PK)     │ │ follower_id │ │ user_id   │ │ id (PK) │ │ id (PK)     │ │ id (PK)       │
+│ user_id(FK) │ │ following_id│ │ alert     │ │ user_id │ │ user_id     │ │ user_id       │
+│ content     │ │ created_at  │ │ severity  │ │device_id│ │ description │ │ token         │
+│ location    │ └─────────────┘ │ status    │ │ name    │ │ location    │ │ expiry_date   │
+│ created_at  │                 │ message   │ │ status  │ │ photo_url   │ └───────────────┘
+└──────┬──────┘                 │ ph_value  │ │paired_at│ │ status      │
+       │                        │temperature│ └─────────┘ │ created_at  │
+       │                        │ turbidity │             └─────────────┘
+       │                        │ location  │
+       │                        │created_at │
+       │                        └───────────┘
+       │
+       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           Post Interaction Tables                             │
+├─────────────────┬─────────────────┬─────────────────┬────────────────────────┤
+│   post_likes    │  post_bookmarks │  post_retweets  │   community_replies    │
+├─────────────────┼─────────────────┼─────────────────┼────────────────────────┤
+│ id (PK)         │ id (PK)         │ id (PK)         │ id (PK)                │
+│ user_id (FK)    │ user_id (FK)    │ user_id (FK)    │ post_id (FK)           │
+│ post_id (FK)    │ post_id (FK)    │ post_id (FK)    │ user_id (FK)           │
+│ created_at      │ created_at      │ created_at      │ content                │
+│                 │                 │                 │ created_at             │
+└─────────────────┴─────────────────┴─────────────────┴────────────────────────┘
+</pre>
+    </div>
+
+    <h3>Entity Relationships Summary</h3>
+
+    <table>
+        <tr>
+            <th>Relationship</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>User → CommunityPost</td>
+            <td>One-to-Many</td>
+            <td>A user can create multiple posts</td>
+        </tr>
+        <tr>
+            <td>User → Alert</td>
+            <td>One-to-Many</td>
+            <td>A user can have multiple alerts</td>
+        </tr>
+        <tr>
+            <td>User → BluetoothDevice</td>
+            <td>One-to-Many</td>
+            <td>A user can pair multiple IoT devices</td>
+        </tr>
+        <tr>
+            <td>User → PollutionReport</td>
+            <td>One-to-Many</td>
+            <td>A user can submit multiple reports</td>
+        </tr>
+        <tr>
+            <td>User ↔ User (Follows)</td>
+            <td>Many-to-Many</td>
+            <td>Users can follow each other via user_follows</td>
+        </tr>
+        <tr>
+            <td>CommunityPost → PostLike</td>
+            <td>One-to-Many</td>
+            <td>A post can have multiple likes</td>
+        </tr>
+        <tr>
+            <td>CommunityPost → CommunityReply</td>
+            <td>One-to-Many</td>
+            <td>A post can have multiple replies</td>
+        </tr>
+    </table>
+
+    <!-- ============================================= -->
+    <!-- SECTION A.4: PROJECT STRUCTURE               -->
+    <!-- ============================================= -->
+
+    <h2 class="page-break">A.4 Project Structure</h2>
+
+    <pre>
+SmartWaterBackend/
+├── build.gradle                          # Gradle build configuration
+├── settings.gradle                       # Gradle settings
+├── gradlew / gradlew.bat                 # Gradle wrapper scripts
+│
+└── src/main/
+    ├── java/com/smartwater/backend/
+    │   │
+    │   ├── SmartWaterBackendApplication.java    # Main entry point
+    │   │
+    │   ├── config/                              # Configuration (4 files)
+    │   │   ├── SecurityConfig.java              # Spring Security + JWT setup
+    │   │   ├── CorsConfig.java                  # CORS configuration
+    │   │   ├── FastApiClientConfig.java         # WebClient configuration
+    │   │   └── FastApiProperties.java           # FastAPI URL properties
+    │   │
+    │   ├── controller/                          # REST Controllers (8 files)
+    │   │   ├── UserController.java              # Auth, registration, profile
+    │   │   ├── SensorController.java            # Sensor data APIs
+    │   │   ├── WaterProxyController.java        # FastAPI gateway proxy
+    │   │   ├── AlertController.java             # Alert evaluation
+    │   │   ├── CommunityController.java         # Posts, likes, bookmarks
+    │   │   ├── FollowController.java            # Follow/unfollow
+    │   │   ├── PollutionReportController.java   # Pollution reports
+    │   │   └── BluetoothController.java         # IoT device pairing
+    │   │
+    │   ├── service/                             # Business Logic (12 files)
+    │   │   ├── UserService.java
+    │   │   ├── AlertService.java
+    │   │   ├── CommunityService.java
+    │   │   ├── FollowService.java
+    │   │   ├── PollutionReportService.java
+    │   │   ├── BluetoothService.java
+    │   │   ├── EmailService.java
+    │   │   ├── EmailVerificationService.java
+    │   │   ├── PasswordResetService.java
+    │   │   ├── FastApiSensorFacadeService.java
+    │   │   ├── WaterProxyService.java
+    │   │   └── CustomUserDetailsService.java
+    │   │
+    │   ├── repository/                          # JPA Repositories (13 files)
+    │   │   ├── UserRepository.java
+    │   │   ├── CommunityPostRepository.java
+    │   │   ├── CommunityReplyRepository.java
+    │   │   ├── PostLikeRepository.java
+    │   │   ├── PostBookmarkRepository.java
+    │   │   ├── PostRetweetRepository.java
+    │   │   ├── UserFollowRepository.java
+    │   │   ├── AlertRepository.java
+    │   │   ├── PollutionReportRepository.java
+    │   │   ├── BluetoothDeviceRepository.java
+    │   │   ├── SensorDataRepository.java
+    │   │   ├── EmailVerificationTokenRepository.java
+    │   │   └── PasswordResetTokenRepository.java
+    │   │
+    │   ├── model/                               # JPA Entities (15 files)
+    │   │   ├── User.java
+    │   │   ├── CommunityPost.java
+    │   │   ├── CommunityReply.java
+    │   │   ├── PostLike.java
+    │   │   ├── PostBookmark.java
+    │   │   ├── PostRetweet.java
+    │   │   ├── UserFollow.java
+    │   │   ├── Alert.java
+    │   │   ├── PollutionReport.java
+    │   │   ├── BluetoothDevice.java
+    │   │   ├── BluetoothConnectionStatus.java   # Enum
+    │   │   ├── SensorData.java
+    │   │   ├── WaterQualityStatus.java          # Enum
+    │   │   ├── EmailVerificationToken.java
+    │   │   └── PasswordResetToken.java
+    │   │
+    │   ├── dto/                                 # Data Transfer Objects (20 files)
+    │   │   ├── AlertResponse.java
+    │   │   ├── BluetoothPairRequest.java
+    │   │   ├── BluetoothDeviceResponse.java
+    │   │   ├── CommunityPostRequest.java
+    │   │   ├── CommunityPostResponse.java
+    │   │   ├── CommunityReplyRequest.java
+    │   │   ├── CommunityReplyResponse.java
+    │   │   ├── CreateReportRequest.java
+    │   │   ├── PollutionReportResponse.java
+    │   │   ├── PageResponse.java
+    │   │   ├── SensorDataRequest.java
+    │   │   ├── SensorDataResponse.java
+    │   │   ├── UserProfileResponse.java
+    │   │   ├── UserUpdateRequest.java
+    │   │   ├── WaterReadingRequest.java
+    │   │   ├── WaterQualitySummaryResponse.java
+    │   │   └── ... (4 more)
+    │   │
+    │   ├── security/                            # Security (2 files)
+    │   │   ├── JwtUtil.java                     # JWT token generation/validation
+    │   │   └── JwtAuthenticationFilter.java     # Request authentication filter
+    │   │
+    │   ├── exception/                           # Exception Handling (4 files)
+    │   │   ├── ApiError.java
+    │   │   ├── BadRequestException.java
+    │   │   ├── NotFoundException.java
+    │   │   └── GlobalExceptionHandler.java
+    │   │
+    │   └── integration/                         # External Integration (1 file)
+    │       └── FastApiSensorClient.java
+    │
+    └── resources/
+        └── application.properties               # Application configuration
+</pre>
+
+    <h3>File Count Summary</h3>
+
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Files</th>
+        </tr>
+        <tr>
+            <td>config/</td>
+            <td>4</td>
+        </tr>
+        <tr>
+            <td>controller/</td>
+            <td>8</td>
+        </tr>
+        <tr>
+            <td>service/</td>
+            <td>12</td>
+        </tr>
+        <tr>
+            <td>repository/</td>
+            <td>13</td>
+        </tr>
+        <tr>
+            <td>model/</td>
+            <td>15</td>
+        </tr>
+        <tr>
+            <td>dto/</td>
+            <td>20</td>
+        </tr>
+        <tr>
+            <td>security/</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>exception/</td>
+            <td>4</td>
+        </tr>
+        <tr>
+            <td>integration/</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>79 Java files</strong></td>
+        </tr>
+    </table>
+
+    <!-- ============================================= -->
+    <!-- SECTION A.5: APPLICATION CONFIGURATION       -->
+    <!-- ============================================= -->
+
+    <h2>A.5 Application Configuration</h2>
+
+    <h3>application.properties</h3>
+
+    <pre>
+# Application Name
+spring.application.name=SmartWaterBackend
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/smartwater_db?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=******
+
+# JPA/Hibernate Settings
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+# Server Configuration
+server.port=8080
+
+# JWT Configuration
+jwt.secret=[SECURE_SECRET_KEY_HERE]
+jwt.expiration=86400000                    # 24 hours in milliseconds
+
+# Email Configuration (Gmail SMTP)
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# External Service Integration
+fastapi.base-url=http://localhost:8888
+
+# Verification URLs
+app.verify-email.base-url=http://localhost:8080/api/users/verify-email
+app.reset-password.base-url=http://localhost:8080/api/users/reset-password
+
+# Actuator (Development)
+management.endpoints.web.exposure.include=mappings,health,info
+</pre>
+
+</body>
+
+</html>

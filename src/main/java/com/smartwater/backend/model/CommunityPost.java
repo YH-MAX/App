@@ -49,6 +49,22 @@ public class CommunityPost {
     @Column(name = "likes")
     private Integer likes;
 
+    // Twitter-like engagement fields
+    @Column(name = "retweet_count")
+    private Integer retweetCount = 0;
+
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
+
+    @Column(name = "bookmark_count")
+    private Integer bookmarkCount = 0;
+
+    @Column(name = "is_retweet")
+    private Boolean isRetweet = false;
+
+    @Column(name = "original_post_id")
+    private Long originalPostId;
+
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -62,6 +78,18 @@ public class CommunityPost {
         }
         if (this.likes == null) {
             this.likes = 0;
+        }
+        if (this.retweetCount == null) {
+            this.retweetCount = 0;
+        }
+        if (this.viewCount == null) {
+            this.viewCount = 0;
+        }
+        if (this.bookmarkCount == null) {
+            this.bookmarkCount = 0;
+        }
+        if (this.isRetweet == null) {
+            this.isRetweet = false;
         }
     }
 
@@ -102,4 +130,20 @@ public class CommunityPost {
 
     public List<CommunityReply> getReplies() { return replies; }
     public void setReplies(List<CommunityReply> replies) { this.replies = replies; }
+
+    // Twitter-like engagement getters/setters
+    public Integer getRetweetCount() { return retweetCount != null ? retweetCount : 0; }
+    public void setRetweetCount(Integer retweetCount) { this.retweetCount = retweetCount; }
+
+    public Integer getViewCount() { return viewCount != null ? viewCount : 0; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+
+    public Integer getBookmarkCount() { return bookmarkCount != null ? bookmarkCount : 0; }
+    public void setBookmarkCount(Integer bookmarkCount) { this.bookmarkCount = bookmarkCount; }
+
+    public Boolean getIsRetweet() { return isRetweet != null ? isRetweet : false; }
+    public void setIsRetweet(Boolean isRetweet) { this.isRetweet = isRetweet; }
+
+    public Long getOriginalPostId() { return originalPostId; }
+    public void setOriginalPostId(Long originalPostId) { this.originalPostId = originalPostId; }
 }

@@ -4,23 +4,16 @@ import com.smartwater.backend.dto.CommunityPostRequest;
 import com.smartwater.backend.dto.CommunityPostResponse;
 import com.smartwater.backend.dto.CommunityReplyRequest;
 import com.smartwater.backend.dto.CommunityReplyResponse;
-import com.smartwater.backend.model.CommunityPost;
-import com.smartwater.backend.model.CommunityReply;
-import com.smartwater.backend.model.User;
-import com.smartwater.backend.repository.CommunityPostRepository;
-import com.smartwater.backend.repository.CommunityReplyRepository;
-import com.smartwater.backend.repository.UserRepository;
+import com.smartwater.backend.model.*;
+import com.smartwater.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.smartwater.backend.dto.PageResponse;
-import com.smartwater.backend.dto.CommunityPostResponse;
-import com.smartwater.backend.dto.CommunityReplyResponse;
-import com.smartwater.backend.model.CommunityPost;
-import com.smartwater.backend.model.CommunityReply;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +30,27 @@ public class CommunityService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PostLikeRepository likeRepository;
 
+    @Autowired
+    private PostBookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private PostRetweetRepository retweetRepository;
+
+    // Current user context for enriching responses
+    private ThreadLocal<User> currentUserContext = new ThreadLocal<>();
+
+    public void setCurrentUser(String email) {
+        if (email != null) {
+            userRepository.findByEmail(email).ifPresent(currentUserContext::set);
+        }
+    }
+
+    public void clearCurrentUser() {
+        currentUserContext.remove();
+    }
 
     private CommunityPost findPostOrThrow(Long id) {
         return postRepository.findById(id)
@@ -54,10 +67,12 @@ public class CommunityService {
         dto.setId(post.getId());
 
         if (post.getUser() != null) {
-            String name = post.getUser().getFirstName();
-
-            dto.setAuthorName(name);
-            dto.setAuthorEmail(post.getUser().getEmail());
+            User author = post.getUser();
+            dto.setAuthorId(author.getId());
+            dto.setAuthorName(author.getFirstName());
+            dto.setAuthorEmail(author.getEmail());
+            dto.setAuthorProfileImageUrl(author.getProfileImageUrl());
+            dto.setAuthorIsExpert(author.isExpert());
         }
 
         dto.setContent(post.getContent());
@@ -72,6 +87,25 @@ public class CommunityService {
 
         int replyCount = post.getReplies() == null ? 0 : post.getReplies().size();
         dto.setReplyCount(replyCount);
+
+        // Twitter-like engagement counts
+        dto.setRetweetCount(post.getRetweetCount());
+        dto.setViewCount(post.getViewCount());
+        dto.setBookmarkCount(post.getBookmarkCount());
+        dto.setIsRetweet(post.getIsRetweet());
+        dto.setOriginalPostId(post.getOriginalPostId());
+
+        // Current user's interaction status
+        User currentUser = currentUserContext.get();
+        if (currentUser != null) {
+            dto.setIsLikedByCurrentUser(likeRepository.existsByUserAndPost(currentUser, post));
+            dto.setIsRetweetedByCurrentUser(retweetRepository.existsByUserAndOriginalPostAndIsQuoteTweetFalse(currentUser, post));
+            dto.setIsBookmarkedByCurrentUser(bookmarkRepository.existsByUserAndPost(currentUser, post));
+        } else {
+            dto.setIsLikedByCurrentUser(false);
+            dto.setIsRetweetedByCurrentUser(false);
+            dto.setIsBookmarkedByCurrentUser(false);
+        }
 
         return dto;
     }
@@ -288,4 +322,252 @@ public class CommunityService {
         return resp;
     }
 
+    // ==================== TWITTER-LIKE FEATURES ====================
+
+    /**
+     * Toggle like on a post (like if not liked, unlike if already liked)
+     */
+    @Transactional
+    public CommunityPostResponse toggleLike(Long postId, String userEmail) {
+        CommunityPost post = findPostOrThrow(postId);
+        User user = findUserOrThrow(userEmail);
+
+        if (likeRepository.existsByUserAndPost(user, post)) {
+            // Unlike
+            likeRepository.deleteByUserAndPost(user, post);
+            post.setLikes(Math.max(0, post.getLikes() - 1));
+        } else {
+            // Like
+            PostLike like = new PostLike(user, post);
+            likeRepository.save(like);
+            post.setLikes(post.getLikes() + 1);
+        }
+
+        postRepository.save(post);
+        setCurrentUser(userEmail);
+        CommunityPostResponse response = toPostResponse(post);
+        clearCurrentUser();
+        return response;
+    }
+
+    /**
+     * Toggle bookmark on a post
+     */
+    @Transactional
+    public CommunityPostResponse toggleBookmark(Long postId, String userEmail) {
+        CommunityPost post = findPostOrThrow(postId);
+        User user = findUserOrThrow(userEmail);
+
+        boolean wasBookmarked = bookmarkRepository.existsByUserAndPost(user, post);
+
+        if (wasBookmarked) {
+            // Remove bookmark
+            bookmarkRepository.deleteByUserAndPost(user, post);
+            post.setBookmarkCount(Math.max(0, post.getBookmarkCount() - 1));
+        } else {
+            // Add bookmark
+            PostBookmark bookmark = new PostBookmark(user, post);
+            bookmarkRepository.save(bookmark);
+            post.setBookmarkCount(post.getBookmarkCount() + 1);
+        }
+
+        postRepository.save(post);
+        setCurrentUser(userEmail);
+        CommunityPostResponse response = toPostResponse(post);
+        clearCurrentUser();
+        return response;
+    }
+
+    /**
+     * Retweet a post (simple retweet)
+     */
+    @Transactional
+    public CommunityPostResponse retweet(Long postId, String userEmail) {
+        CommunityPost post = findPostOrThrow(postId);
+        User user = findUserOrThrow(userEmail);
+
+        // Check if already retweeted
+        if (retweetRepository.existsByUserAndOriginalPostAndIsQuoteTweetFalse(user, post)) {
+            throw new RuntimeException("You have already retweeted this post");
+        }
+
+        PostRetweet retweet = new PostRetweet(user, post);
+        retweetRepository.save(retweet);
+
+        post.setRetweetCount(post.getRetweetCount() + 1);
+        postRepository.save(post);
+
+        setCurrentUser(userEmail);
+        CommunityPostResponse response = toPostResponse(post);
+        clearCurrentUser();
+        return response;
+    }
+
+    /**
+     * Undo retweet
+     */
+    @Transactional
+    public CommunityPostResponse undoRetweet(Long postId, String userEmail) {
+        CommunityPost post = findPostOrThrow(postId);
+        User user = findUserOrThrow(userEmail);
+
+        if (!retweetRepository.existsByUserAndOriginalPostAndIsQuoteTweetFalse(user, post)) {
+            throw new RuntimeException("You have not retweeted this post");
+        }
+
+        retweetRepository.deleteByUserAndOriginalPostAndIsQuoteTweetFalse(user, post);
+        post.setRetweetCount(Math.max(0, post.getRetweetCount() - 1));
+        postRepository.save(post);
+
+        setCurrentUser(userEmail);
+        CommunityPostResponse response = toPostResponse(post);
+        clearCurrentUser();
+        return response;
+    }
+
+    /**
+     * Quote tweet - retweet with added comment
+     */
+    @Transactional
+    public CommunityPostResponse quoteTweet(Long originalPostId, String userEmail, String quoteContent) {
+        CommunityPost originalPost = findPostOrThrow(originalPostId);
+        User user = findUserOrThrow(userEmail);
+
+        if (quoteContent == null || quoteContent.trim().isEmpty()) {
+            throw new RuntimeException("Quote content cannot be empty");
+        }
+
+        PostRetweet quote = new PostRetweet(user, originalPost, quoteContent.trim());
+        retweetRepository.save(quote);
+
+        originalPost.setRetweetCount(originalPost.getRetweetCount() + 1);
+        postRepository.save(originalPost);
+
+        // Return the original post with updated count
+        setCurrentUser(userEmail);
+        CommunityPostResponse response = toPostResponse(originalPost);
+        clearCurrentUser();
+        return response;
+    }
+
+    /**
+     * Get user's bookmarks
+     */
+    public PageResponse<CommunityPostResponse> getUserBookmarks(String userEmail, Integer page, Integer size) {
+        User user = findUserOrThrow(userEmail);
+
+        int p = (page == null || page < 0) ? 0 : page;
+        int s = (size == null || size <= 0 || size > 50) ? 20 : size;
+        Pageable pageable = PageRequest.of(p, s);
+
+        Page<PostBookmark> pageResult = bookmarkRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+
+        setCurrentUser(userEmail);
+        PageResponse<CommunityPostResponse> resp = new PageResponse<>();
+        resp.setItems(pageResult.getContent().stream()
+                .map(b -> toPostResponse(b.getPost()))
+                .toList());
+        resp.setPage(pageResult.getNumber());
+        resp.setSize(pageResult.getSize());
+        resp.setTotalElements(pageResult.getTotalElements());
+        resp.setTotalPages(pageResult.getTotalPages());
+        resp.setLast(pageResult.isLast());
+        clearCurrentUser();
+        return resp;
+    }
+
+    /**
+     * Get user's liked posts
+     */
+    public PageResponse<CommunityPostResponse> getUserLikedPosts(String userEmail, Integer page, Integer size) {
+        User user = findUserOrThrow(userEmail);
+
+        int p = (page == null || page < 0) ? 0 : page;
+        int s = (size == null || size <= 0 || size > 50) ? 20 : size;
+        Pageable pageable = PageRequest.of(p, s);
+
+        Page<PostLike> pageResult = likeRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+
+        setCurrentUser(userEmail);
+        PageResponse<CommunityPostResponse> resp = new PageResponse<>();
+        resp.setItems(pageResult.getContent().stream()
+                .map(l -> toPostResponse(l.getPost()))
+                .toList());
+        resp.setPage(pageResult.getNumber());
+        resp.setSize(pageResult.getSize());
+        resp.setTotalElements(pageResult.getTotalElements());
+        resp.setTotalPages(pageResult.getTotalPages());
+        resp.setLast(pageResult.isLast());
+        clearCurrentUser();
+        return resp;
+    }
+
+    /**
+     * Increment view count for a post
+     */
+    @Transactional
+    public void incrementViewCount(Long postId) {
+        CommunityPost post = findPostOrThrow(postId);
+        post.setViewCount(post.getViewCount() + 1);
+        postRepository.save(post);
+    }
+
+    /**
+     * Search posts by content or hashtag
+     */
+    public PageResponse<CommunityPostResponse> searchPosts(String query, String userEmail, Integer page, Integer size) {
+        int p = (page == null || page < 0) ? 0 : page;
+        int s = (size == null || size <= 0 || size > 50) ? 20 : size;
+        Pageable pageable = PageRequest.of(p, s);
+
+        Page<CommunityPost> pageResult = postRepository.findByContentContainingIgnoreCaseOrderByCreatedAtDesc(query, pageable);
+
+        if (userEmail != null) {
+            setCurrentUser(userEmail);
+        }
+        PageResponse<CommunityPostResponse> resp = new PageResponse<>();
+        resp.setItems(pageResult.getContent().stream()
+                .map(this::toPostResponse)
+                .toList());
+        resp.setPage(pageResult.getNumber());
+        resp.setSize(pageResult.getSize());
+        resp.setTotalElements(pageResult.getTotalElements());
+        resp.setTotalPages(pageResult.getTotalPages());
+        resp.setLast(pageResult.isLast());
+        if (userEmail != null) {
+            clearCurrentUser();
+        }
+        return resp;
+    }
+
+    /**
+     * Get posts by user ID
+     */
+    public PageResponse<CommunityPostResponse> getPostsByUser(Long userId, String currentUserEmail, Integer page, Integer size) {
+        User author = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        int p = (page == null || page < 0) ? 0 : page;
+        int s = (size == null || size <= 0 || size > 50) ? 20 : size;
+        Pageable pageable = PageRequest.of(p, s);
+
+        Page<CommunityPost> pageResult = postRepository.findByUserOrderByCreatedAtDesc(author, pageable);
+
+        if (currentUserEmail != null) {
+            setCurrentUser(currentUserEmail);
+        }
+        PageResponse<CommunityPostResponse> resp = new PageResponse<>();
+        resp.setItems(pageResult.getContent().stream()
+                .map(this::toPostResponse)
+                .toList());
+        resp.setPage(pageResult.getNumber());
+        resp.setSize(pageResult.getSize());
+        resp.setTotalElements(pageResult.getTotalElements());
+        resp.setTotalPages(pageResult.getTotalPages());
+        resp.setLast(pageResult.isLast());
+        if (currentUserEmail != null) {
+            clearCurrentUser();
+        }
+        return resp;
+    }
 }

@@ -40,6 +40,25 @@ public class User {
     @Column(name = "role", nullable = false, length = 20)
     private String role;
 
+    // Twitter-like profile fields
+    @Column(name = "bio", length = 160)
+    private String bio;
+
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
+
+    @Column(name = "header_image_url", length = 500)
+    private String headerImageUrl;
+
+    @Column(name = "follower_count")
+    private Integer followerCount = 0;
+
+    @Column(name = "following_count")
+    private Integer followingCount = 0;
+
+    @Column(name = "post_count")
+    private Integer postCount = 0;
+
     @PrePersist
     public void onCreate() {
         if (this.createdAt == null) {
@@ -138,4 +157,23 @@ public class User {
         String r = role.toUpperCase();
         return "EXPERT".equals(r) || "ADMIN".equals(r);
     }
+
+    // Twitter-like profile getters/setters
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getProfileImageUrl() { return profileImageUrl; }
+    public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
+
+    public String getHeaderImageUrl() { return headerImageUrl; }
+    public void setHeaderImageUrl(String headerImageUrl) { this.headerImageUrl = headerImageUrl; }
+
+    public Integer getFollowerCount() { return followerCount != null ? followerCount : 0; }
+    public void setFollowerCount(Integer followerCount) { this.followerCount = followerCount; }
+
+    public Integer getFollowingCount() { return followingCount != null ? followingCount : 0; }
+    public void setFollowingCount(Integer followingCount) { this.followingCount = followingCount; }
+
+    public Integer getPostCount() { return postCount != null ? postCount : 0; }
+    public void setPostCount(Integer postCount) { this.postCount = postCount; }
 }

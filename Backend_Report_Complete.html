@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Backend Implementation Report</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            margin: 1in;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 11pt;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #d9d9d9;
+            font-weight: bold;
+        }
+
+        p {
+            margin: 8px 0;
+            text-align: justify;
+        }
+
+        ul {
+            margin: 5px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 4px 0;
+        }
+
+        .flow-diagram {
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>4. Backend Implementation (Spring Boot)</h2>
+
+    <h3>4.1 Overview</h3>
+
+    <p>The SmartWater Backend is a RESTful API service built with <strong>Spring Boot 3.5.7</strong>, serving as the
+        core server infrastructure for the mobile application. It provides user authentication, real-time water quality
+        monitoring, community engagement features, and pollution reporting capabilities.</p>
+
+    <h3>4.2 Technology Stack</h3>
+
+    <table>
+        <tr>
+            <th>Technology</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>Spring Boot</td>
+            <td>3.5.7</td>
+            <td>Core REST API framework</td>
+        </tr>
+        <tr>
+            <td>Spring Security + JWT</td>
+            <td>6.x / 0.11.5</td>
+            <td>Authentication and authorization</td>
+        </tr>
+        <tr>
+            <td>Spring Data JPA</td>
+            <td>3.x</td>
+            <td>Database ORM (Object-Relational Mapping)</td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>8.0</td>
+            <td>Relational database storage</td>
+        </tr>
+        <tr>
+            <td>Spring Mail</td>
+            <td>-</td>
+            <td>Email verification and password reset</td>
+        </tr>
+        <tr>
+            <td>Spring WebFlux</td>
+            <td>-</td>
+            <td>Reactive HTTP client for FastAPI integration</td>
+        </tr>
+        <tr>
+            <td>Java</td>
+            <td>17</td>
+            <td>Programming language</td>
+        </tr>
+        <tr>
+            <td>Gradle</td>
+            <td>8.x</td>
+            <td>Build automation tool</td>
+        </tr>
+    </table>
+
+    <h3>4.3 System Architecture</h3>
+
+    <p>The backend follows a <strong>three-tier layered architecture</strong> pattern with clear separation of concerns:
+    </p>
+
+    <ul>
+        <li><strong>Presentation Layer (Controllers):</strong> 8 REST controllers handling HTTP requests and responses
+        </li>
+        <li><strong>Business Logic Layer (Services):</strong> 12 service classes containing core application logic</li>
+        <li><strong>Data Access Layer (Repositories):</strong> 13 JPA repository interfaces for database operations</li>
+    </ul>
+
+    <p>The system integrates with an external <strong>FastAPI IoT service</strong> (port 8888) for real-time sensor
+        data. The data flow is illustrated below:</p>
+
+    <div class="flow-diagram">
+        <strong>Backend ↔ FastAPI Integration Data Flow</strong><br><br>
+        <span class="flow-arrow">
+            [Mobile App] → [Spring Boot :8080] → [WebClient] → [FastAPI :8888] → [Sensor JSON]<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+            [Mobile App] ← [Spring Boot :8080] ← [Process Data] ← [Return Response] ←─────────┘
+        </span>
+    </div>
+
+    <h3>4.4 Core Modules</h3>
+
+    <table>
+        <tr>
+            <th>Module</th>
+            <th>Components</th>
+            <th>Functionality</th>
+        </tr>
+        <tr>
+            <td><strong>User Authentication</strong></td>
+            <td>UserController, UserService, JwtUtil, JwtAuthenticationFilter</td>
+            <td>User registration, JWT login, email verification, password reset, profile management</td>
+        </tr>
+        <tr>
+            <td><strong>Sensor Data</strong></td>
+            <td>SensorController, FastApiSensorFacadeService</td>
+            <td>Real-time water quality data retrieval, historical data queries, summary statistics</td>
+        </tr>
+        <tr>
+            <td><strong>Water Gateway</strong></td>
+            <td>WaterProxyController, WaterProxyService</td>
+            <td>FastAPI proxy layer for direct sensor access, connection testing</td>
+        </tr>
+        <tr>
+            <td><strong>Alert System</strong></td>
+            <td>AlertController, AlertService</td>
+            <td>Water quality threshold monitoring (pH: 6.0-8.5, Temp: &lt;30°C), alert generation with HIGH/MEDIUM/LOW
+                severity</td>
+        </tr>
+        <tr>
+            <td><strong>Community Platform</strong></td>
+            <td>CommunityController, CommunityService, FollowController, FollowService</td>
+            <td>Create posts, like/bookmark/retweet, reply, search, follow/unfollow users</td>
+        </tr>
+        <tr>
+            <td><strong>Pollution Reporting</strong></td>
+            <td>PollutionReportController, PollutionReportService</td>
+            <td>Submit pollution reports with location/photo, status tracking (PENDING → IN_PROGRESS → RESOLVED)</td>
+        </tr>
+        <tr>
+            <td><strong>Bluetooth/IoT</strong></td>
+            <td>BluetoothController, BluetoothService</td>
+            <td>IoT device pairing, connection status management</td>
+        </tr>
+    </table>
+
+    <h3>4.5 API Endpoints</h3>
+
+    <p>The backend exposes <strong>45+ RESTful API endpoints</strong> organized into 8 groups:</p>
+
+    <table>
+        <tr>
+            <th>Endpoint Group</th>
+            <th>Base Path</th>
+            <th>Key Operations</th>
+            <th>Auth</th>
+        </tr>
+        <tr>
+            <td>Authentication</td>
+            <td>/api/users</td>
+            <td>register, login, logout, verify-email, forgot-password, reset-password</td>
+            <td>Mixed</td>
+        </tr>
+        <tr>
+            <td>User Profile</td>
+            <td>/api/users/me</td>
+            <td>get profile, update profile</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>Sensor Data</td>
+            <td>/api/sensor</td>
+            <td>device/{id}/latest, me/latest, me/range, me/summary, upload</td>
+            <td>Mixed</td>
+        </tr>
+        <tr>
+            <td><strong>Water Gateway</strong></td>
+            <td><strong>/api/water</strong></td>
+            <td><strong>latest, history, test-connection (FastAPI proxy)</strong></td>
+            <td><strong>Public</strong></td>
+        </tr>
+        <tr>
+            <td>Alerts</td>
+            <td>/api/alerts</td>
+            <td>evaluate, get user alerts, get all alerts</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>Community</td>
+            <td>/api/community</td>
+            <td>posts (CRUD), like, bookmark, retweet, quote, replies, search</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>Reports</td>
+            <td>/api/reports</td>
+            <td>create report, get my reports, update status</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>Bluetooth</td>
+            <td>/api/bluetooth</td>
+            <td>pair device, update status, get my devices</td>
+            <td>Required</td>
+        </tr>
+    </table>
+
+    <h3>4.6 Database Design</h3>
+
+    <p>The MySQL database consists of <strong>13 tables</strong> managed by Spring Data JPA with Hibernate:</p>
+
+    <table>
+        <tr>
+            <th>Category</th>
+            <th>Tables</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><strong>User Management</strong></td>
+            <td>users, email_verification_tokens, password_reset_tokens</td>
+            <td>User accounts, email verification, password recovery</td>
+        </tr>
+        <tr>
+            <td><strong>Community</strong></td>
+            <td>community_posts, community_replies, post_likes, post_bookmarks, post_retweets, user_follows</td>
+            <td>Social platform features</td>
+        </tr>
+        <tr>
+            <td><strong>Monitoring</strong></td>
+            <td>alerts, sensor_data, pollution_reports, bluetooth_devices</td>
+            <td>Water quality monitoring and IoT devices</td>
+        </tr>
+    </table>
+
+    <p><strong>Key Entity Relationships:</strong></p>
+    <ul>
+        <li><strong>User → Posts/Alerts/Devices:</strong> One-to-Many relationships</li>
+        <li><strong>User → User (Follows):</strong> Many-to-Many via user_follows junction table</li>
+        <li><strong>Post → Replies/Likes/Bookmarks:</strong> One-to-Many relationships</li>
+    </ul>
+
+    <h3>4.7 Security Implementation</h3>
+
+    <p>The backend implements comprehensive security measures:</p>
+
+    <ul>
+        <li><strong>JWT Authentication:</strong> Stateless token-based authentication with HMAC-SHA256 signing and
+            24-hour expiration</li>
+        <li><strong>Password Security:</strong> BCrypt hashing algorithm with random salt</li>
+        <li><strong>Email Verification:</strong> Required before account activation; verification link sent via Gmail
+            SMTP</li>
+        <li><strong>Protected Endpoints:</strong> All sensitive endpoints require valid JWT token in Authorization
+            header</li>
+        <li><strong>CORS Configuration:</strong> Cross-origin requests enabled for mobile app integration</li>
+    </ul>
+
+    <h3>4.8 External Integration</h3>
+
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Configuration</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><strong>FastAPI IoT Service</strong></td>
+            <td>http://localhost:8888</td>
+            <td>Real-time water sensor data from IoT devices via WebClient reactive calls</td>
+        </tr>
+        <tr>
+            <td><strong>Gmail SMTP</strong></td>
+            <td>smtp.gmail.com:587 (STARTTLS)</td>
+            <td>Email verification and password reset emails</td>
+        </tr>
+    </table>
+
+    <p>The <strong>Water Gateway (/api/water)</strong> acts as a proxy layer between the mobile app and FastAPI,
+        providing unified access to sensor data while maintaining security and request handling at the Spring Boot
+        level.</p>
+
+    <h3>4.9 Implementation Statistics</h3>
+
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Count</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Java Source Files</td>
+            <td>79</td>
+            <td>Total backend codebase</td>
+        </tr>
+        <tr>
+            <td>REST Controllers</td>
+            <td>8</td>
+            <td>API endpoint handlers</td>
+        </tr>
+        <tr>
+            <td>Service Classes</td>
+            <td>12</td>
+            <td>Business logic layer</td>
+        </tr>
+        <tr>
+            <td>JPA Entities</td>
+            <td>15</td>
+            <td>Database table mappings</td>
+        </tr>
+        <tr>
+            <td>Repository Interfaces</td>
+            <td>13</td>
+            <td>Data access layer</td>
+        </tr>
+        <tr>
+            <td>DTOs</td>
+            <td>20</td>
+            <td>Data transfer objects</td>
+        </tr>
+        <tr>
+            <td>API Endpoints</td>
+            <td>45+</td>
+            <td>RESTful operations</td>
+        </tr>
+        <tr>
+            <td>Database Tables</td>
+            <td>13</td>
+            <td>MySQL relational tables</td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

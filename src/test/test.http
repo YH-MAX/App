@@ -1,7 +1,35 @@
-PUT http://localhost:8080/api/reports/1/status
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZDIwMDZ5eGNAMTYzLmNvbSIsImlhdCI6MTc2NDk5NTYxNywiZXhwIjoxNzY1MDgyMDE3fQ.O1QGaAwk3aeMdlz1kjMcmSqq7zWjUfNcbh_6QygRx3s
+
+# 2. Login get JWT
+POST http://localhost:8080/api/users/login
 Content-Type: application/json
 
 {
-  "status": "ABC"
+  "email": "bitebyte4@gmail.com",
+  "password": "111111"
 }
+
+###Get the latest device data (no authentication required)
+GET http://localhost:8080/api/sensor/device/WATER_001/latest
+
+#### Alert System
+POST http://localhost:8080/api/alerts/evaluate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiaXRlYnl0ZTVZzWjV5ppx1q3iFaz9WdvULDhUzs118SP5NTY5LCJleHAiOjE3Njg0NjU5Njl9.BnzItIoUntf2th1RmugOsCj7iul7fzmTGsDT8r5KWok
+
+{
+  "ph": 5.2,
+  "temperature": 35,
+  "turbidity": 8
+}
+
+####
+# Post
+POST http://localhost:8080/api/community/posts
+
+{
+  "content": "The water is good!",
+  "location": "City Lake"
+}
+###
+# like_count
+POST http://localhost:8080/api/community/posts/1/like

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Section 5 - Testing And Validation</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            margin: 1in;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 11pt;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #d9d9d9;
+            font-weight: bold;
+        }
+
+        p {
+            margin: 8px 0;
+            text-align: justify;
+        }
+
+        ul {
+            margin: 5px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>5. Testing And Validation</h2>
+
+    <h3>5.1 Backend API Testing</h3>
+
+    <p>We used IntelliJ's built-in HTTP Client to test all our backend APIs. For each API endpoint, we checked if the
+        request returns the correct response and the data is stored properly in the database.</p>
+
+    <p>Here are some of the main tests we ran:</p>
+
+    <table>
+        <tr>
+            <th>API</th>
+            <th>What We Tested</th>
+            <th>Result</th>
+        </tr>
+        <tr>
+            <td>Login</td>
+            <td>User enters email and password, server returns JWT token</td>
+            <td>Works</td>
+        </tr>
+        <tr>
+            <td>Get Sensor Data</td>
+            <td>Fetch latest water quality reading from device WATER_001</td>
+            <td>Works</td>
+        </tr>
+        <tr>
+            <td>Alert Evaluation</td>
+            <td>Submit water readings with low pH (5.2), check if alert is generated</td>
+            <td>Works - returns HIGH severity</td>
+        </tr>
+        <tr>
+            <td>Create Post</td>
+            <td>Post new message to community feed</td>
+            <td>Works</td>
+        </tr>
+        <tr>
+            <td>Get User Profile</td>
+            <td>Retrieve current user's profile info</td>
+            <td>Works</td>
+        </tr>
+    </table>
+
+    <h3>5.2 Security Testing</h3>
+
+    <p>We tested the JWT authentication to make sure protected APIs cannot be accessed without login:</p>
+
+    <ul>
+        <li>When we tried to access /api/alerts/me without a token, the server returned 403 Forbidden - this is correct
+        </li>
+        <li>When we used an expired token, the server returned 401 Unauthorized</li>
+        <li>When we used a valid token, the server returned the expected data</li>
+    </ul>
+
+    <p>We also checked the database directly and confirmed that passwords are stored as BCrypt hashes, not plain text.
+    </p>
+
+    <h3>5.3 End-to-End Testing</h3>
+
+    <p>We tested the complete flow from the Android app through the backend to the database to make sure everything
+        works together:</p>
+
+    <p><strong>Test 1: User Registration and Login Flow</strong></p>
+    <ol>
+        <li>Open the app and tap "Register"</li>
+        <li>Enter email, password, and username</li>
+        <li>Check email inbox for verification link</li>
+        <li>Click the link to verify account</li>
+        <li>Go back to app and login with the registered credentials</li>
+        <li>Result: User successfully logged in and redirected to Dashboard</li>
+    </ol>
+
+    <p><strong>Test 2: Water Quality Monitoring Flow</strong></p>
+    <ol>
+        <li>Login to the app</li>
+        <li>View Dashboard - check if sensor data is displayed</li>
+        <li>Data refreshes every 5 seconds automatically</li>
+        <li>When pH goes below 6.5, alert notification appears</li>
+        <li>Result: Real-time data flows correctly from FastAPI → Backend → Android App</li>
+    </ol>
+
+    <p><strong>Test 3: Community Post Flow</strong></p>
+    <ol>
+        <li>Go to Community tab</li>
+        <li>Create a new post about water quality</li>
+        <li>Check if the post appears in the feed</li>
+        <li>Like and bookmark the post</li>
+        <li>Result: Post saved to database and displayed correctly</li>
+    </ol>
+
+    <p><strong>Test 4: Pollution Report Flow</strong></p>
+    <ol>
+        <li>Go to Reports section</li>
+        <li>Submit a new pollution report with location</li>
+        <li>Check the report appears in "My Reports"</li>
+        <li>Result: Report saved with OPEN status</li>
+    </ol>
+
+    <h3>5.4 Issues Found and Fixed</h3>
+
+    <p>During testing, we encountered a few issues:</p>
+
+    <ul>
+        <li>Initially the Community and Reports APIs returned 403 error even for GET requests. We fixed this by updating
+            SecurityConfig.java to allow public GET access</li>
+        <li>The Android app was trying to connect to localhost, which doesn't work on a real phone. We changed it to use
+            the actual server IP address</li>
+        <li>Dashboard data wasn't updating because FastAPI service wasn't running. We need to start both backend server
+            and FastAPI before using the app</li>
+    </ul>
+
+    <h3>5.5 Conclusion</h3>
+
+    <p>All the main features have been tested from end to end. The system works correctly when all components (Android
+        App, Spring Boot Backend, FastAPI Service, MySQL Database) are running together.</p>
+
+</body>
+
+</html>

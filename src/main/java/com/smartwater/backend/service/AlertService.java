@@ -2,7 +2,14 @@ package com.smartwater.backend.service;
 
 import com.smartwater.backend.dto.AlertResponse;
 import com.smartwater.backend.dto.WaterReadingRequest;
+import com.smartwater.backend.model.Alert;
+import com.smartwater.backend.model.User;
+import com.smartwater.backend.repository.AlertRepository;
+import com.smartwater.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AlertService {
@@ -10,6 +17,14 @@ public class AlertService {
     private static final double MIN_PH = 6.5;
     private static final double MAX_PH = 8.5;
     private static final double MAX_TURBIDITY = 5.0; // NTU
+
+    private final AlertRepository alertRepository;
+    private final UserRepository userRepository;
+
+    public AlertService(AlertRepository alertRepository, UserRepository userRepository) {
+        this.alertRepository = alertRepository;
+        this.userRepository = userRepository;
+    }
 
     public AlertResponse evaluateReading(WaterReadingRequest reading) {
         if (reading.getPh() == null && reading.getTurbidity() == null) {
@@ -64,5 +79,71 @@ public class AlertService {
         }
 
         return new AlertResponse(alert, status, severity, message.toString().trim());
+    }
+
+    /**
+     * Evaluate and save alert to database
+     */
+    public AlertResponse evaluateAndSave(WaterReadingRequest reading, String email) {
+        AlertResponse response = evaluateReading(reading);
+        
+        User user = userRepository.findByEmail(email).orElse(null);
+        
+        Alert alertEntity = new Alert();
+        alertEntity.setUser(user);
+        alertEntity.setAlert(response.isAlert());
+        alertEntity.setSeverity(response.getSeverity());
+        alertEntity.setStatus(response.getStatus());
+        alertEntity.setMessage(response.getMessage());
+        alertEntity.setPhValue(reading.getPh());
+        alertEntity.setTemperature(reading.getTemperature());
+        alertEntity.setTurbidity(reading.getTurbidity());
+        alertEntity.setLocation(reading.getLocation());
+        
+        Alert saved = alertRepository.save(alertEntity);
+        
+        return toResponse(saved);
+    }
+
+    /**
+     * Get alert history for user
+     */
+    public List<AlertResponse> getAlertsForUser(String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return List.of();
+        }
+        return alertRepository.findByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all alerts (admin)
+     */
+    public List<AlertResponse> getAllAlerts() {
+        return alertRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    private AlertResponse toResponse(Alert alert) {
+        AlertResponse response = new AlertResponse(
+                alert.isAlert(),
+                alert.getStatus(),
+                alert.getSeverity(),
+                alert.getMessage()
+        );
+        response.setId(alert.getId());
+        response.setPhValue(alert.getPhValue());
+        response.setTemperature(alert.getTemperature());
+        response.setTurbidity(alert.getTurbidity());
+        response.setLocation(alert.getLocation());
+        if (alert.getCreatedAt() != null) {
+            response.setTimestamp(alert.getCreatedAt().toString());
+        }
+        return response;
     }
 }

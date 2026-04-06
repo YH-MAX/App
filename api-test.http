@@ -1,0 +1,55 @@
+### ===========================================
+### SmartWater Backend API Test
+### Usage: Execute requests in order
+### ===========================================
+
+### 1. Login - Token will be saved automatically
+# @name login
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "email": "bitebyte4@gmail.com",
+  "password": "111111"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+    client.log("Token saved successfully!");
+%}
+
+### 2. Sensor Data (Public endpoint, no auth required)
+GET http://localhost:8080/api/sensor/device/WATER_001/latest
+
+### 3. Alert Evaluation (Uses saved token)
+POST http://localhost:8080/api/alerts/evaluate
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "ph": 5.2,
+  "temperature": 35,
+  "turbidity": 8
+}
+
+### 4. Create Community Post (Uses saved token)
+POST http://localhost:8080/api/community/posts
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "content": "Water quality report: Excellent conditions today!",
+  "location": "City Lake"
+}
+
+### 5. Get Community Posts List
+GET http://localhost:8080/api/community/posts?page=0&size=10
+Authorization: Bearer {{auth_token}}
+
+### 6. Get User Alert History
+GET http://localhost:8080/api/alerts/me
+Authorization: Bearer {{auth_token}}
+
+### 7. Get User Profile
+GET http://localhost:8080/api/users/me/profile
+Authorization: Bearer {{auth_token}}

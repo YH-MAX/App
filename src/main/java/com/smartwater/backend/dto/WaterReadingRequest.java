@@ -5,6 +5,7 @@ public class WaterReadingRequest {
     private Double ph;
     private Double temperature;
     private Double turbidity;
+    private String location;
 
     public Double getPh() {
         return ph;
@@ -28,5 +29,13 @@ public class WaterReadingRequest {
 
     public void setTurbidity(Double turbidity) {
         this.turbidity = turbidity;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

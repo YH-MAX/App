@@ -2,15 +2,14 @@ package com.smartwater.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public class SensorDataRequest {
-
+public class WaterIngestRequest {
     @NotNull
     private Double ph;
-
     @NotNull
     private Double temperature;
-
+    @NotNull
     private Double turbidity;
+
     private String location; // optional
 
     public Double getPh() { return ph; }

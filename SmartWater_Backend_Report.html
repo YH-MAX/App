@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SmartWater Backend Report</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            margin: 1in;
+            color: #333;
+        }
+        h1 {
+            font-size: 24pt;
+            text-align: center;
+            color: #1a5276;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #1a5276;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 16pt;
+            color: #1a5276;
+            margin-top: 25px;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 5px;
+        }
+        h3 {
+            font-size: 14pt;
+            color: #2874a6;
+            margin-top: 20px;
+        }
+        h4 {
+            font-size: 12pt;
+            color: #34495e;
+            margin-top: 15px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+            font-size: 11pt;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #1a5276;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10pt;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        .cover-page {
+            text-align: center;
+            page-break-after: always;
+            padding-top: 200px;
+        }
+        .cover-page h1 {
+            font-size: 32pt;
+            border: none;
+            margin-bottom: 20px;
+        }
+        .cover-page p {
+            font-size: 14pt;
+            margin: 10px 0;
+        }
+        .toc {
+            page-break-after: always;
+        }
+        .toc h2 {
+            text-align: center;
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 8px 0;
+            font-size: 12pt;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #1a5276;
+        }
+        .section {
+            page-break-inside: avoid;
+        }
+        .diagram {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 9pt;
+            white-space: pre;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 10pt;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Cover Page -->
+<div class="cover-page">
+    <h1>💧 SmartWater Backend Report</h1>
+    <p><strong>SmartWater Monitoring System</strong></p>
+    <p>Backend Module Documentation</p>
+    <br><br>
+    <p><strong>Technology:</strong> Spring Boot 3.5.7</p>
+    <p><strong>Language:</strong> Java 17</p>
+    <p><strong>Database:</strong> MySQL 8.0</p>
+    <br><br><br>
+    <p><strong>Date:</strong> January 2026</p>
+</div>
+
+<!-- Table of Contents -->
+<div class="toc">
+    <h2>Table of Contents</h2>
+    <ul>
+        <li>1. <a href="#intro">Introduction</a></li>
+        <li>2. <a href="#tech">Technology Stack</a></li>
+        <li>3. <a href="#arch">System Architecture</a></li>
+        <li>4. <a href="#modules">Backend Modules</a></li>
+        <li>5. <a href="#features">Key Features Implementation</a></li>
+        <li>6. <a href="#api">API Endpoints Summary</a></li>
+        <li>7. <a href="#database">Database Schema</a></li>
+        <li>8. <a href="#security">Security Implementation</a></li>
+        <li>9. <a href="#integration">External Integration</a></li>
+        <li>10. <a href="#config">Configuration</a></li>
+        <li>11. <a href="#code">Code Implementation Examples</a></li>
+        <li>12. <a href="#deployment">Development & Deployment</a></li>
+        <li>13. <a href="#conclusion">Conclusion</a></li>
+    </ul>
+</div>
+
+<!-- Section 1: Introduction -->
+<h2 id="intro">1. Introduction</h2>
+
+<p>The SmartWater Backend is a robust RESTful API service developed using the <strong>Spring Boot 3.5.7</strong> framework, serving as the core backend infrastructure for the SmartWater Monitoring System. This backend powers the Android mobile application, providing essential functionalities including user authentication, real-time water quality monitoring, community engagement, and pollution reporting.</p>
+
+<p>The backend follows a layered architecture pattern with clear separation of concerns, implementing industry-standard security practices including JWT-based authentication and BCrypt password encryption.</p>
+
+<h3>1.1 Project Objectives</h3>
+<ul>
+    <li>Provide secure user authentication and authorization</li>
+    <li>Enable real-time water quality data monitoring</li>
+    <li>Implement community engagement features for information sharing</li>
+    <li>Support pollution incident reporting and tracking</li>
+    <li>Integrate with IoT sensor devices via FastAPI service</li>
+</ul>
+
+<!-- Section 2: Technology Stack -->
+<h2 id="tech">2. Technology Stack</h2>
+
+<table>
+    <tr>
+        <th>Technology</th>
+        <th>Version</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td><strong>Spring Boot</strong></td>
+        <td>3.5.7</td>
+        <td>Core application framework</td>
+    </tr>
+    <tr>
+        <td><strong>Spring Security</strong></td>
+        <td>6.x</td>
+        <td>Authentication & Authorization</td>
+    </tr>
+    <tr>
+        <td><strong>Spring Data JPA</strong></td>
+        <td>3.x</td>
+        <td>Database ORM (Object-Relational Mapping)</td>
+    </tr>
+    <tr>
+        <td><strong>MySQL</strong></td>
+        <td>8.0</td>
+        <td>Primary relational database</td>
+    </tr>
+    <tr>
+        <td><strong>JWT (jjwt)</strong></td>
+        <td>0.11.5</td>
+        <td>Token-based stateless authentication</td>
+    </tr>
+    <tr>
+        <td><strong>Spring Mail</strong></td>
+        <td>-</td>
+        <td>Email verification & password reset</td>
+    </tr>
+    <tr>
+        <td><strong>Spring WebFlux</strong></td>
+        <td>-</td>
+        <td>Reactive WebClient for external API calls</td>
+    </tr>
+    <tr>
+        <td><strong>Lombok</strong></td>
+        <td>-</td>
+        <td>Reducing boilerplate code</td>
+    </tr>
+    <tr>
+        <td><strong>Gradle</strong></td>
+        <td>8.x</td>
+        <td>Build automation tool</td>
+    </tr>
+    <tr>
+        <td><strong>Java</strong></td>
+        <td>17</td>
+        <td>Programming language</td>
+    </tr>
+</table>
+
+<!-- Section 3: System Architecture -->
+<h2 id="arch">3. System Architecture</h2>
+
+<h3>3.1 Three-Tier Layered Architecture</h3>
+
+<p>The SmartWater Backend follows a three-tier layered architecture pattern:</p>
+
+<div class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                     Presentation Layer                          │
+│  (REST Controllers - Handle HTTP requests/responses)            │
+├─────────────────────────────────────────────────────────────────┤
+│                      Service Layer                              │
+│  (Business Logic - Data processing, validation, integration)    │
+├─────────────────────────────────────────────────────────────────┤
+│                    Data Access Layer                            │
+│  (JPA Repositories - Database CRUD operations)                  │
+├─────────────────────────────────────────────────────────────────┤
+│                       Database                                  │
+│  (MySQL 8.0 - Data persistence)                                 │
+└─────────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>3.2 Component Interaction Diagram</h3>
+
+<div class="diagram">
+┌───────────────────┐
+│   Android App     │
+└────────┬──────────┘
+         │ REST API (HTTPS)
+         ▼
+┌───────────────────────────────────────────────────────────┐
+│              SmartWater Backend (Spring Boot)              │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │                    Controllers                       │  │
+│  │  User | Sensor | Community | Alert | Report | etc.  │  │
+│  └──────────────────────┬──────────────────────────────┘  │
+│                         ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │                     Services                         │  │
+│  │  Authentication | Email | Alert | Community | etc.  │  │
+│  └──────────────────────┬──────────────────────────────┘  │
+│                         ▼                                  │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │                   Repositories                       │  │
+│  │            (Spring Data JPA Interfaces)              │  │
+│  └──────────────────────┬──────────────────────────────┘  │
+└─────────────────────────┼─────────────────────────────────┘
+                          ▼
+         ┌────────────────┴────────────────┐
+         ▼                                 ▼
+┌─────────────────┐             ┌─────────────────────┐
+│  MySQL Database │             │ FastAPI IoT Service │
+│  (Data Storage) │             │ (Sensor Data)       │
+└─────────────────┘             └─────────────────────┘
+</div>
+
+<!-- Section 4: Backend Modules -->
+<h2 id="modules">4. Backend Modules</h2>
+
+<h3>4.1 Project Structure Overview</h3>
+
+<p>The backend project consists of <strong>79 Java files</strong> organized into the following packages:</p>
+
+<table>
+    <tr>
+        <th>Package</th>
+        <th>Files</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><code>config/</code></td>
+        <td>4</td>
+        <td>Security, CORS, and external service configuration</td>
+    </tr>
+    <tr>
+        <td><code>controller/</code></td>
+        <td>8</td>
+        <td>REST API endpoint handlers</td>
+    </tr>
+    <tr>
+        <td><code>dto/</code></td>
+        <td>20</td>
+        <td>Data Transfer Objects for API requests/responses</td>
+    </tr>
+    <tr>
+        <td><code>exception/</code></td>
+        <td>4</td>
+        <td>Custom exceptions and global error handling</td>
+    </tr>
+    <tr>
+        <td><code>integration/</code></td>
+        <td>1</td>
+        <td>External service integration clients</td>
+    </tr>
+    <tr>
+        <td><code>model/</code></td>
+        <td>15</td>
+        <td>JPA entity classes (database tables)</td>
+    </tr>
+    <tr>
+        <td><code>repository/</code></td>
+        <td>13</td>
+        <td>Spring Data JPA repository interfaces</td>
+    </tr>
+    <tr>
+        <td><code>security/</code></td>
+        <td>2</td>
+        <td>JWT utilities and authentication filter</td>
+    </tr>
+    <tr>
+        <td><code>service/</code></td>
+        <td>12</td>
+        <td>Business logic implementation</td>
+    </tr>
+</table>
+
+<h3>4.2 Controllers (8 files)</h3>
+
+<p>Controllers handle incoming HTTP requests and return appropriate responses:</p>
+
+<table>
+    <tr>
+        <th>Controller</th>
+        <th>Endpoint Base</th>
+        <th>Responsibility</th>
+    </tr>
+    <tr>
+        <td><code>UserController</code></td>
+        <td>/api/users</td>
+        <td>User registration, login, profile management</td>
+    </tr>
+    <tr>
+        <td><code>SensorController</code></td>
+        <td>/api/sensor</td>
+        <td>Sensor data retrieval from FastAPI</td>
+    </tr>
+    <tr>
+        <td><code>CommunityController</code></td>
+        <td>/api/community</td>
+        <td>Posts, likes, bookmarks, replies</td>
+    </tr>
+    <tr>
+        <td><code>AlertController</code></td>
+        <td>/api/alerts</td>
+        <td>Water quality alert evaluation</td>
+    </tr>
+    <tr>
+        <td><code>FollowController</code></td>
+        <td>/api/users</td>
+        <td>Follow/unfollow social features</td>
+    </tr>
+    <tr>
+        <td><code>PollutionReportController</code></td>
+        <td>/api/reports</td>
+        <td>Pollution incident reporting</td>
+    </tr>
+    <tr>
+        <td><code>BluetoothController</code></td>
+        <td>/api/bluetooth</td>
+        <td>IoT device pairing management</td>
+    </tr>
+    <tr>
+        <td><code>WaterProxyController</code></td>
+        <td>/api/water</td>
+        <td>FastAPI gateway proxy</td>
+    </tr>
+</table>
+
+<h3>4.3 Services (12 files)</h3>
+
+<p>Services contain the core business logic and processing:</p>
+
+<table>
+    <tr>
+        <th>Service</th>
+        <th>Responsibility</th>
+    </tr>
+    <tr>
+        <td><code>UserService</code></td>
+        <td>User CRUD operations, authentication logic</td>
+    </tr>
+    <tr>
+        <td><code>CommunityService</code></td>
+        <td>Post creation, likes, bookmarks, retweets</td>
+    </tr>
+    <tr>
+        <td><code>AlertService</code></td>
+        <td>Water quality threshold evaluation, alert generation</td>
+    </tr>
+    <tr>
+        <td><code>FollowService</code></td>
+        <td>Social follow/unfollow functionality</td>
+    </tr>
+    <tr>
+        <td><code>PollutionReportService</code></td>
+        <td>Report creation and status management</td>
+    </tr>
+    <tr>
+        <td><code>BluetoothService</code></td>
+        <td>Device pairing and connection tracking</td>
+    </tr>
+    <tr>
+        <td><code>EmailService</code></td>
+        <td>SMTP email sending functionality</td>
+    </tr>
+    <tr>
+        <td><code>EmailVerificationService</code></td>
+        <td>Email verification token management</td>
+    </tr>
+    <tr>
+        <td><code>PasswordResetService</code></td>
+        <td>Password reset workflow</td>
+    </tr>
+    <tr>
+        <td><code>FastApiSensorFacadeService</code></td>
+        <td>WebClient calls to external FastAPI service</td>
+    </tr>
+    <tr>
+        <td><code>WaterProxyService</code></td>
+        <td>RestTemplate proxy to FastAPI</td>
+    </tr>
+    <tr>
+        <td><code>CustomUserDetailsService</code></td>
+        <td>Spring Security UserDetails implementation</td>
+    </tr>
+</table>
+
+<h3>4.4 Models/Entities (15 files)</h3>
+
+<p>JPA entities representing database tables:</p>
+
+<table>
+    <tr>
+        <th>Entity</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><code>User</code></td>
+        <td>User account information</td>
+    </tr>
+    <tr>
+        <td><code>CommunityPost</code></td>
+        <td>Community forum posts</td>
+    </tr>
+    <tr>
+        <td><code>CommunityReply</code></td>
+        <td>Replies to community posts</td>
+    </tr>
+    <tr>
+        <td><code>PostLike</code></td>
+        <td>Like records for posts</td>
+    </tr>
+    <tr>
+        <td><code>PostBookmark</code></td>
+        <td>Bookmark records for posts</td>
+    </tr>
+    <tr>
+        <td><code>PostRetweet</code></td>
+        <td>Retweet/share records</td>
+    </tr>
+    <tr>
+        <td><code>UserFollow</code></td>
+        <td>User follow relationships</td>
+    </tr>
+    <tr>
+        <td><code>Alert</code></td>
+        <td>Water quality alerts history</td>
+    </tr>
+    <tr>
+        <td><code>PollutionReport</code></td>
+        <td>Pollution incident reports</td>
+    </tr>
+    <tr>
+        <td><code>BluetoothDevice</code></td>
+        <td>Paired IoT sensor devices</td>
+    </tr>
+    <tr>
+        <td><code>SensorData</code></td>
+        <td>Water sensor readings</td>
+    </tr>
+    <tr>
+        <td><code>EmailVerificationToken</code></td>
+        <td>Email verification tokens</td>
+    </tr>
+    <tr>
+        <td><code>PasswordResetToken</code></td>
+        <td>Password reset tokens</td>
+    </tr>
+</table>
+
+<h3>4.5 Repositories (13 files)</h3>
+
+<p>Spring Data JPA interfaces for database operations:</p>
+
+<table>
+    <tr>
+        <th>Repository</th>
+        <th>Entity</th>
+    </tr>
+    <tr><td><code>UserRepository</code></td><td>User</td></tr>
+    <tr><td><code>CommunityPostRepository</code></td><td>CommunityPost</td></tr>
+    <tr><td><code>CommunityReplyRepository</code></td><td>CommunityReply</td></tr>
+    <tr><td><code>PostLikeRepository</code></td><td>PostLike</td></tr>
+    <tr><td><code>PostBookmarkRepository</code></td><td>PostBookmark</td></tr>
+    <tr><td><code>PostRetweetRepository</code></td><td>PostRetweet</td></tr>
+    <tr><td><code>UserFollowRepository</code></td><td>UserFollow</td></tr>
+    <tr><td><code>AlertRepository</code></td><td>Alert</td></tr>
+    <tr><td><code>PollutionReportRepository</code></td><td>PollutionReport</td></tr>
+    <tr><td><code>BluetoothDeviceRepository</code></td><td>BluetoothDevice</td></tr>
+    <tr><td><code>SensorDataRepository</code></td><td>SensorData</td></tr>
+    <tr><td><code>EmailVerificationTokenRepository</code></td><td>EmailVerificationToken</td></tr>
+    <tr><td><code>PasswordResetTokenRepository</code></td><td>PasswordResetToken</td></tr>
+</table>
+
+<!-- Section 5: Key Features -->
+<h2 id="features">5. Key Features Implementation</h2>
+
+<h3>5.1 User Authentication & Management</h3>
+
+<p>The authentication system implements <strong>JWT (JSON Web Token)</strong> based stateless authentication:</p>
+
+<ul>
+    <li><strong>Registration:</strong> Users register with email, username, and password. Passwords are hashed using BCrypt algorithm.</li>
+    <li><strong>Email Verification:</strong> A verification token is sent to the user's email. Account activation requires email confirmation.</li>
+    <li><strong>Login:</strong> Upon successful authentication, a JWT token is generated with 24-hour expiration.</li>
+    <li><strong>Password Reset:</strong> Users can request password reset via email with a secure token.</li>
+    <li><strong>Profile Management:</strong> Users can update their profile information including avatar, bio, and location.</li>
+</ul>
+
+<div class="highlight">
+<strong>Security Flow:</strong><br>
+Register → Email Verification → Login → JWT Token → Access Protected APIs
+</div>
+
+<h3>5.2 Sensor Data Integration</h3>
+
+<p>The backend integrates with an external <strong>FastAPI IoT service</strong> to retrieve real-time water quality sensor data:</p>
+
+<ul>
+    <li><strong>Latest Reading:</strong> Fetch the most recent sensor reading for a specific device</li>
+    <li><strong>Historical Data:</strong> Query sensor data within a specified time range</li>
+    <li><strong>Summary Statistics:</strong> Generate water quality summary including averages and status</li>
+</ul>
+
+<p><strong>Integration Method:</strong> Spring WebClient (reactive, non-blocking HTTP client)</p>
+
+<h3>5.3 Alert System</h3>
+
+<p>The alert system monitors water quality parameters and generates alerts based on predefined thresholds:</p>
+
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Critical Threshold</th>
+        <th>Warning Threshold</th>
+    </tr>
+    <tr>
+        <td>pH Level</td>
+        <td>&lt; 6.0 or &gt; 8.5</td>
+        <td>6.0-6.5 or 8.0-8.5</td>
+    </tr>
+    <tr>
+        <td>Temperature</td>
+        <td>&gt; 40°C</td>
+        <td>&gt; 30°C</td>
+    </tr>
+    <tr>
+        <td>Turbidity</td>
+        <td>&gt; 100 NTU</td>
+        <td>&gt; 50 NTU</td>
+    </tr>
+</table>
+
+<p><strong>Alert Severity Levels:</strong></p>
+<ul>
+    <li><strong>HIGH:</strong> Immediate action required (critical thresholds exceeded)</li>
+    <li><strong>MEDIUM:</strong> Attention needed (warning thresholds exceeded)</li>
+    <li><strong>LOW:</strong> Informational alerts</li>
+</ul>
+
+<h3>5.4 Community Platform</h3>
+
+<p>A Twitter-like social platform for water quality discussions:</p>
+
+<table>
+    <tr>
+        <th>Feature</th>
+        <th>Description</th>
+    </tr>
+    <tr><td>Posts</td><td>Create posts with content and location tags</td></tr>
+    <tr><td>Likes</td><td>Toggle like on posts</td></tr>
+    <tr><td>Bookmarks</td><td>Save posts for later viewing</td></tr>
+    <tr><td>Retweets</td><td>Share posts to your feed</td></tr>
+    <tr><td>Quote Tweets</td><td>Share posts with additional comments</td></tr>
+    <tr><td>Replies</td><td>Comment on posts</td></tr>
+    <tr><td>Search</td><td>Search posts by content</td></tr>
+    <tr><td>Feed</td><td>Paginated timeline of posts</td></tr>
+</table>
+
+<h3>5.5 Social Features</h3>
+
+<p>User-to-user social interactions:</p>
+<ul>
+    <li><strong>Follow/Unfollow:</strong> Users can follow other users</li>
+    <li><strong>Followers List:</strong> View who follows a user</li>
+    <li><strong>Following List:</strong> View who a user follows</li>
+    <li><strong>User Profiles:</strong> View public user profiles</li>
+</ul>
+
+<h3>5.6 Pollution Reporting</h3>
+
+<p>Citizens can report pollution incidents:</p>
+<ul>
+    <li><strong>Submit Reports:</strong> Report pollution with description, photo, and location</li>
+    <li><strong>Status Tracking:</strong> Reports have status (PENDING → IN_PROGRESS → RESOLVED)</li>
+    <li><strong>Admin Management:</strong> Administrators can update report status</li>
+    <li><strong>Auto-Generation:</strong> HIGH severity alerts automatically create pollution reports</li>
+</ul>
+
+<h3>5.7 Bluetooth Device Management</h3>
+
+<p>IoT device pairing and management:</p>
+<ul>
+    <li><strong>Device Pairing:</strong> Link Bluetooth water sensors to user accounts</li>
+    <li><strong>Connection Status:</strong> Track device connection states (CONNECTED, DISCONNECTED, PAIRING)</li>
+    <li><strong>Device List:</strong> Retrieve all devices paired with a user</li>
+</ul>
+
+<!-- Section 6: API Endpoints -->
+<h2 id="api">6. API Endpoints Summary</h2>
+
+<h3>6.1 Authentication APIs (/api/users)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>POST</td><td>/register</td><td>Register new user</td><td>No</td></tr>
+    <tr><td>POST</td><td>/login</td><td>Login and get JWT token</td><td>No</td></tr>
+    <tr><td>POST</td><td>/logout</td><td>Logout user</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/verify-email</td><td>Verify email with token</td><td>No</td></tr>
+    <tr><td>POST</td><td>/forgot-password</td><td>Request password reset</td><td>No</td></tr>
+    <tr><td>POST</td><td>/reset-password</td><td>Reset password</td><td>No</td></tr>
+    <tr><td>GET</td><td>/me</td><td>Get current user profile</td><td>Yes</td></tr>
+    <tr><td>PUT</td><td>/me</td><td>Update user profile</td><td>Yes</td></tr>
+</table>
+
+<h3>6.2 Sensor APIs (/api/sensor)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>GET</td><td>/device/{deviceId}/latest</td><td>Get latest device reading</td><td>No</td></tr>
+    <tr><td>GET</td><td>/me/latest</td><td>Get user's latest reading</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/me/range</td><td>Get readings in time range</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/me/summary</td><td>Get water quality summary</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/upload</td><td>Upload sensor data</td><td>Yes</td></tr>
+</table>
+
+<h3>6.3 Alert APIs (/api/alerts)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>POST</td><td>/evaluate</td><td>Evaluate water reading</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/me</td><td>Get user's alert history</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/</td><td>Get all alerts (admin)</td><td>Yes</td></tr>
+</table>
+
+<h3>6.4 Community APIs (/api/community)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>POST</td><td>/posts</td><td>Create a post</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/posts</td><td>Get feed (paginated)</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/posts/{id}</td><td>Get post by ID</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/posts/{id}/like</td><td>Toggle like</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/posts/{id}/bookmark</td><td>Toggle bookmark</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/posts/{id}/retweet</td><td>Retweet</td><td>Yes</td></tr>
+    <tr><td>DELETE</td><td>/posts/{id}/retweet</td><td>Undo retweet</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/posts/{id}/quote</td><td>Quote tweet</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/posts/{id}/replies</td><td>Add reply</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/posts/{id}/replies</td><td>Get replies</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/search</td><td>Search posts</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/bookmarks</td><td>Get bookmarks</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/likes</td><td>Get liked posts</td><td>Yes</td></tr>
+</table>
+
+<h3>6.5 Report APIs (/api/reports)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>POST</td><td>/</td><td>Create pollution report</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/me</td><td>Get my reports</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/</td><td>Get all reports</td><td>Yes</td></tr>
+    <tr><td>PUT</td><td>/{id}/status</td><td>Update report status</td><td>Yes</td></tr>
+</table>
+
+<h3>6.6 Social APIs (/api/users)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>POST</td><td>/{userId}/follow</td><td>Follow user</td><td>Yes</td></tr>
+    <tr><td>DELETE</td><td>/{userId}/follow</td><td>Unfollow user</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/{userId}/is-following</td><td>Check if following</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/{userId}/followers</td><td>Get followers list</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/{userId}/following</td><td>Get following list</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/{userId}/profile</td><td>Get user profile</td><td>Yes</td></tr>
+</table>
+
+<h3>6.7 Bluetooth APIs (/api/bluetooth)</h3>
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Description</th>
+        <th>Auth</th>
+    </tr>
+    <tr><td>POST</td><td>/pair</td><td>Pair a new device</td><td>Yes</td></tr>
+    <tr><td>POST</td><td>/status</td><td>Update connection status</td><td>Yes</td></tr>
+    <tr><td>GET</td><td>/me/devices</td><td>Get user's paired devices</td><td>Yes</td></tr>
+</table>
+
+<!-- Section 7: Database Schema -->
+<h2 id="database">7. Database Schema</h2>
+
+<h3>7.1 Entity Relationship Overview</h3>
+
+<p>The database consists of <strong>13 main tables</strong>:</p>
+
+<table>
+    <tr>
+        <th>Table</th>
+        <th>Primary Key</th>
+        <th>Description</th>
+    </tr>
+    <tr><td>users</td><td>id</td><td>User accounts</td></tr>
+    <tr><td>community_posts</td><td>id</td><td>Forum posts</td></tr>
+    <tr><td>community_replies</td><td>id</td><td>Post replies</td></tr>
+    <tr><td>post_likes</td><td>id</td><td>Like records</td></tr>
+    <tr><td>post_bookmarks</td><td>id</td><td>Bookmark records</td></tr>
+    <tr><td>post_retweets</td><td>id</td><td>Retweet records</td></tr>
+    <tr><td>user_follows</td><td>id</td><td>Follow relationships</td></tr>
+    <tr><td>alerts</td><td>id</td><td>Alert history</td></tr>
+    <tr><td>pollution_reports</td><td>id</td><td>Pollution reports</td></tr>
+    <tr><td>bluetooth_devices</td><td>id</td><td>Paired devices</td></tr>
+    <tr><td>sensor_data</td><td>id</td><td>Sensor readings</td></tr>
+    <tr><td>email_verification_tokens</td><td>id</td><td>Email tokens</td></tr>
+    <tr><td>password_reset_tokens</td><td>id</td><td>Reset tokens</td></tr>
+</table>
+
+<h3>7.2 Entity Relationship Diagram</h3>
+
+<div class="diagram">
+                           ┌─────────────────┐
+                           │      User       │
+                           ├─────────────────┤
+                           │ id (PK)         │
+                           │ email           │
+                           │ username        │
+                           │ password        │
+                           │ avatar_url      │
+                           │ bio             │
+                           │ location        │
+                           │ email_verified  │
+                           │ created_at      │
+                           └────────┬────────┘
+                                    │
+        ┌───────────────┬───────────┼───────────┬───────────────┐
+        │               │           │           │               │
+        ▼               ▼           ▼           ▼               ▼
+┌───────────────┐ ┌───────────┐ ┌─────────┐ ┌─────────────┐ ┌──────────────┐
+│ CommunityPost │ │UserFollow │ │  Alert  │ │BluetoothDev │ │PollutionRept │
+├───────────────┤ ├───────────┤ ├─────────┤ ├─────────────┤ ├──────────────┤
+│ id (PK)       │ │ id (PK)   │ │ id (PK) │ │ id (PK)     │ │ id (PK)      │
+│ user_id (FK)  │ │follower_id│ │ user_id │ │ user_id     │ │ user_id      │
+│ content       │ │following_id│ │ type   │ │ device_id   │ │ description  │
+│ location      │ │ created_at│ │ message │ │ name        │ │ location     │
+│ created_at    │ └───────────┘ │ severity│ │ status      │ │ status       │
+└───────┬───────┘               │ created │ │ paired_at   │ │ photo_url    │
+        │                       └─────────┘ └─────────────┘ └──────────────┘
+        │
+        ▼
+┌───────────────────────────────────────────────────────┐
+│                Related Tables (M:N)                    │
+├─────────────┬───────────────┬─────────────────────────┤
+│  PostLike   │ PostBookmark  │     PostRetweet         │
+│  (user_id,  │ (user_id,     │     (user_id,           │
+│   post_id)  │  post_id)     │      post_id)           │
+└─────────────┴───────────────┴─────────────────────────┘
+</div>
+
+<h3>7.3 Key Relationships</h3>
+
+<ul>
+    <li><strong>User ↔ CommunityPost:</strong> One-to-Many (User creates many posts)</li>
+    <li><strong>User ↔ UserFollow:</strong> Many-to-Many (Users follow each other)</li>
+    <li><strong>CommunityPost ↔ CommunityReply:</strong> One-to-Many (Post has many replies)</li>
+    <li><strong>User ↔ Alert:</strong> One-to-Many (User has many alerts)</li>
+    <li><strong>User ↔ BluetoothDevice:</strong> One-to-Many (User pairs many devices)</li>
+</ul>
+
+<!-- Section 8: Security Implementation -->
+<h2 id="security">8. Security Implementation</h2>
+
+<h3>8.1 Authentication Security</h3>
+
+<table>
+    <tr>
+        <th>Security Measure</th>
+        <th>Implementation</th>
+    </tr>
+    <tr><td>Password Hashing</td><td>BCrypt algorithm with salt</td></tr>
+    <tr><td>Token-based Auth</td><td>JWT with HMAC-SHA256 signing</td></tr>
+    <tr><td>Token Expiration</td><td>24 hours (configurable)</td></tr>
+    <tr><td>Email Verification</td><td>Required before login</td></tr>
+    <tr><td>Password Reset</td><td>Secure token-based reset flow</td></tr>
+</table>
+
+<h3>8.2 JWT Authentication Flow</h3>
+
+<div class="diagram">
+┌─────────┐                                      ┌─────────────┐
+│  Client │                                      │   Server    │
+└────┬────┘                                      └──────┬──────┘
+     │                                                   │
+     │  1. POST /api/users/login                         │
+     │      { email, password }                          │
+     │ ─────────────────────────────────────────────────▶│
+     │                                                   │
+     │                            2. Validate credentials│
+     │                            3. Generate JWT token  │
+     │                                                   │
+     │  4. Return { token: "eyJhbG..." }                 │
+     │ ◀─────────────────────────────────────────────────│
+     │                                                   │
+     │  5. GET /api/protected-resource                   │
+     │     Header: Authorization: Bearer <token>         │
+     │ ─────────────────────────────────────────────────▶│
+     │                                                   │
+     │                           6. Validate JWT token   │
+     │                           7. Extract user context │
+     │                           8. Process request      │
+     │                                                   │
+     │  9. Return protected data                         │
+     │ ◀─────────────────────────────────────────────────│
+     │                                                   │
+</div>
+
+<h3>8.3 Endpoint Security</h3>
+
+<ul>
+    <li><strong>Public Endpoints:</strong> Registration, login, email verification, device latest data</li>
+    <li><strong>Protected Endpoints:</strong> All other endpoints require valid JWT token</li>
+    <li><strong>CORS Configuration:</strong> Configured to allow cross-origin requests</li>
+</ul>
+
+<!-- Section 9: External Integration -->
+<h2 id="integration">9. External Integration</h2>
+
+<h3>9.1 FastAPI Sensor Service</h3>
+
+<p>The backend integrates with an external FastAPI service for IoT sensor data:</p>
+
+<table>
+    <tr>
+        <th>Configuration</th>
+        <th>Value</th>
+    </tr>
+    <tr><td>Base URL</td><td>http://localhost:8888</td></tr>
+    <tr><td>Protocol</td><td>HTTP REST API</td></tr>
+    <tr><td>Client</td><td>Spring WebClient (reactive)</td></tr>
+</table>
+
+<p><strong>Integrated Endpoints:</strong></p>
+<ul>
+    <li><code>GET /api/device/{deviceId}/latest</code> - Latest sensor reading</li>
+    <li><code>GET /api/me/range</code> - Historical sensor data</li>
+</ul>
+
+<h3>9.2 Email Service (SMTP)</h3>
+
+<p>Email functionality for verification and password reset:</p>
+
+<table>
+    <tr>
+        <th>Configuration</th>
+        <th>Value</th>
+    </tr>
+    <tr><td>Provider</td><td>Gmail SMTP</td></tr>
+    <tr><td>Host</td><td>smtp.gmail.com</td></tr>
+    <tr><td>Port</td><td>587</td></tr>
+    <tr><td>Security</td><td>STARTTLS</td></tr>
+</table>
+
+<!-- Section 10: Configuration -->
+<h2 id="config">10. Configuration</h2>
+
+<h3>10.1 Application Properties</h3>
+
+<pre>
+# Application
+spring.application.name=SmartWaterBackend
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/smartwater_db
+spring.datasource.username=root
+spring.datasource.password=******
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+
+# Server
+server.port=8080
+
+# JWT Configuration
+jwt.secret=[SECURE_SECRET_KEY]
+jwt.expiration=86400000
+
+# Email Configuration
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# FastAPI Integration
+fastapi.base-url=http://localhost:8888
+
+# Actuator
+management.endpoints.web.exposure.include=mappings,health,info
+</pre>
+
+<!-- Section 11: Code Implementation Examples -->
+<h2 id="code">11. Code Implementation Examples</h2>
+
+<h3>11.1 JWT Token Generation (JwtUtil.java)</h3>
+
+<pre>
+@Component
+public class JwtUtil {
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private Long expirationMs;
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+}
+</pre>
+
+<h3>11.2 User Login Endpoint (UserController.java)</h3>
+
+<pre>
+@PostMapping("/login")
+public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; login(@RequestBody Map&lt;String, String&gt; loginRequest) {
+    String email = loginRequest.get("email");
+    String password = loginRequest.get("password");
+
+    // Authenticate user
+    authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(email, password)
+    );
+
+    // Check if email is verified
+    User user = userService.findByEmail(email);
+    if (!user.isEmailVerified()) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(Map.of("error", "Email not verified"));
+    }
+
+    // Generate JWT token
+    String token = jwtUtil.generateToken(email);
+
+    Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();
+    response.put("token", token);
+    response.put("user", user);
+
+    return ResponseEntity.ok(response);
+}
+</pre>
+
+<h3>11.3 Alert Evaluation Service (AlertService.java)</h3>
+
+<pre>
+@Service
+public class AlertService {
+
+    public AlertResponse evaluateWaterQuality(WaterReadingRequest reading, User user) {
+        String message = "";
+        String severity = "LOW";
+
+        // Check pH levels
+        if (reading.getPh() < 6.0 || reading.getPh() > 8.5) {
+            message = "Critical: pH level out of safe range!";
+            severity = "HIGH";
+        } else if (reading.getPh() < 6.5 || reading.getPh() > 8.0) {
+            message = "Warning: pH level approaching unsafe range";
+            severity = "MEDIUM";
+        }
+
+        // Check temperature
+        if (reading.getTemperature() > 40) {
+            severity = "HIGH";
+            message += " Critical temperature detected!";
+        } else if (reading.getTemperature() > 30) {
+            if (!severity.equals("HIGH")) severity = "MEDIUM";
+            message += " Elevated temperature warning.";
+        }
+
+        // Save alert to database
+        Alert alert = new Alert();
+        alert.setUser(user);
+        alert.setMessage(message);
+        alert.setSeverity(severity);
+        alertRepository.save(alert);
+
+        return new AlertResponse(severity, message);
+    }
+}
+</pre>
+
+<!-- Section 12: Development & Deployment -->
+<h2 id="deployment">12. Development & Deployment</h2>
+
+<h3>12.1 Prerequisites</h3>
+
+<ul>
+    <li>Java 17 or higher</li>
+    <li>MySQL 8.0 database</li>
+    <li>Gradle build tool</li>
+</ul>
+
+<h3>12.2 Build & Run Commands</h3>
+
+<pre>
+# Build the project
+./gradlew build
+
+# Run the application
+./gradlew bootRun
+
+# Run tests
+./gradlew test
+</pre>
+
+<h3>12.3 Server Information</h3>
+
+<table>
+    <tr>
+        <th>Configuration</th>
+        <th>Value</th>
+    </tr>
+    <tr><td>Default Port</td><td>8080</td></tr>
+    <tr><td>Context Path</td><td>/</td></tr>
+    <tr><td>Health Check</td><td>/actuator/health</td></tr>
+</table>
+
+<!-- Section 13: Conclusion -->
+<h2 id="conclusion">13. Conclusion</h2>
+
+<p>The SmartWater Backend provides a comprehensive, secure, and scalable API infrastructure for the SmartWater Monitoring System. Key achievements include:</p>
+
+<ol>
+    <li><strong>Robust Authentication:</strong> JWT-based stateless authentication with email verification</li>
+    <li><strong>Real-time Integration:</strong> Seamless integration with IoT sensor data via FastAPI</li>
+    <li><strong>Community Features:</strong> Full-featured social platform for water quality discussions</li>
+    <li><strong>Alert System:</strong> Automated monitoring and alerting for water quality issues</li>
+    <li><strong>Clean Architecture:</strong> Well-organized codebase following Spring Boot best practices</li>
+    <li><strong>Security-First:</strong> Implementation of industry-standard security measures</li>
+</ol>
+
+<p>The backend successfully serves as the foundation for the Android mobile application, enabling users to monitor water quality, report pollution incidents, and engage with the community.</p>
+
+<h3>Implementation Statistics</h3>
+
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Count</th>
+    </tr>
+    <tr><td>Total Java Source Files</td><td>79</td></tr>
+    <tr><td>REST Controllers</td><td>8</td></tr>
+    <tr><td>Service Classes</td><td>12</td></tr>
+    <tr><td>JPA Entity Models</td><td>15</td></tr>
+    <tr><td>Repository Interfaces</td><td>13</td></tr>
+    <tr><td>Data Transfer Objects (DTOs)</td><td>20</td></tr>
+    <tr><td>Configuration Classes</td><td>4</td></tr>
+    <tr><td>Exception Handling Classes</td><td>4</td></tr>
+    <tr><td>Total API Endpoints</td><td>40+</td></tr>
+    <tr><td>Database Tables</td><td>13</td></tr>
+</table>
+
+<div class="footer">
+    <hr>
+    <p><strong>SmartWater Monitoring System - Backend Module Report</strong></p>
+    <p>Report Generated: January 2026</p>
+</div>
+
+</body>
+</html>

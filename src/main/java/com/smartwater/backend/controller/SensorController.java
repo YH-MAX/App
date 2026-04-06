@@ -3,8 +3,7 @@ package com.smartwater.backend.controller;
 import com.smartwater.backend.dto.SensorDataRequest;
 import com.smartwater.backend.dto.SensorDataResponse;
 import com.smartwater.backend.dto.WaterQualitySummaryResponse;
-import com.smartwater.backend.model.SensorData;
-import com.smartwater.backend.service.SensorDataService;
+import com.smartwater.backend.integration.FastApiSensorClient;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,67 +18,78 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class SensorController {
 
-    private final SensorDataService sensorDataService;
+    private final FastApiSensorClient fastApiSensorClient;
 
-    public SensorController(SensorDataService sensorDataService) {
-        this.sensorDataService = sensorDataService;
+    public SensorController(FastApiSensorClient fastApiSensorClient) {
+        this.fastApiSensorClient = fastApiSensorClient;
+    }
+    
+    // ✅ TEST: Direct FastAPI call to debug connection
+    @GetMapping("/test-fastapi")
+    public String testFastApiConnection() {
+        try {
+            String url = "http://localhost:8001/api/me/range?email=aicrafter1412@gmail.com&from=2026-01-05T00:00:00&to=2026-01-07T00:00:00";
+            System.out.println("📊 [TEST] Calling: " + url);
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            String response = restTemplate.getForObject(url, String.class);
+            System.out.println("📊 [TEST] Response length: " + (response != null ? response.length() : "null"));
+            return "FastAPI Response: " + (response != null ? response.substring(0, Math.min(500, response.length())) : "null");
+        } catch (Exception e) {
+            System.err.println("❌ [TEST] Error: " + e.getMessage());
+            return "Error: " + e.getMessage();
+        }
     }
 
-
+    // ✅ 兼容旧路径：/api/sensor/upload 也改成转发 FastAPI（不落 MySQL）
     @PostMapping("/upload")
     public SensorDataResponse uploadSensorData(
             @RequestBody @Valid SensorDataRequest req,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String email = userDetails.getUsername();
-
-        SensorData data = new SensorData();
-        data.setPh(req.getPh());
-        data.setTemperature(req.getTemperature());
-        data.setTurbidity(req.getTurbidity());
-        data.setLocation(req.getLocation());
-        // timestamp 在实体里默认是 LocalDateTime.now()
-
-        SensorData saved = sensorDataService.saveSensorDataForUser(data, email);
-        return sensorDataService.toResponse(saved);
+        return fastApiSensorClient.ingest(email, req);
     }
 
+    // ✅ Dashboard: Get latest data for specific device (e.g., WATER_001)
+    @GetMapping("/device/{deviceId}/latest")
+    public SensorDataResponse getDeviceLatest(@PathVariable String deviceId) {
+        System.out.println("📊 [SensorController] getDeviceLatest called for: " + deviceId);
+        return fastApiSensorClient.getDeviceLatest(deviceId);
+    }
 
     @GetMapping("/me/latest")
-    public SensorDataResponse getMyLatest(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
+    public SensorDataResponse getMyLatest(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
-        return sensorDataService.getLatestForUserWithStatus(email);
+        return fastApiSensorClient.getLatest(email);
     }
-
 
     @GetMapping("/me/range")
     public List<SensorDataResponse> getMyDataInRange(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime from,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime to
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
         String email = userDetails.getUsername();
-        return sensorDataService.getDataForUserInRangeWithStatus(email, from, to);
+        System.out.println("📊 [SensorController] getMyDataInRange called for: " + email);
+        
+        try {
+            List<SensorDataResponse> result = fastApiSensorClient.getRange(email, from, to);
+            System.out.println("📊 [SensorController] Got " + (result != null ? result.size() : "null") + " records");
+            return result != null ? result : java.util.Collections.emptyList();
+        } catch (Exception e) {
+            System.err.println("❌ [SensorController] Error: " + e.getMessage());
+            // Return empty list instead of throwing to avoid 500 error
+            return java.util.Collections.emptyList();
+        }
     }
-
 
     @GetMapping("/me/summary")
     public WaterQualitySummaryResponse getMySummary(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime from,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime to
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
         String email = userDetails.getUsername();
-        return sensorDataService.getSummaryForUserInRange(email, from, to);
+        return fastApiSensorClient.getSummary(email, from, to);
     }
 }

@@ -1,21 +1,18 @@
 package com.smartwater.backend.dto;
 
-import com.smartwater.backend.model.WaterQualityStatus;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.time.LocalDateTime;
-
-
-@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SensorDataResponse {
+    public Long id;
+    public Double ph;
+    public Double temperature;
+    public Double turbidity;
+    public String location;
+    public String timestamp;
+    public String email;
+    public String status;
 
-    private Long id;
-    private double ph;
-    private double temperature;
-    private double turbidity;
-    private String location;
-    private LocalDateTime timestamp;
-
-
-    private WaterQualityStatus status;
+    // Default constructor needed for Jackson
+    public SensorDataResponse() {}
 }
